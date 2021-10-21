@@ -1,8 +1,11 @@
 #include <iostream>
-#include "token/token.hpp"
-#include "token/linepr.hpp"
+#include "parser/token/token.hpp"
+#include "parser/token/linepr.hpp"
 
-int main() {
+#include "parser/var/var.hpp"
+#include "parser/expr/expr.hpp"
+
+void tokenizePrompt() {
     while (true) {
         std::string test;
         std::cout << ">> ";
@@ -15,5 +18,30 @@ int main() {
             std::cout << std::string(tok) << "\n";
         }
     }
+}
+
+int main() {
+    //tokenizePrompt();
+    try {
+        std::shared_ptr<Variable> test;
+
+        std::shared_ptr<Token> a(new Token("\"aaa\""));
+        std::shared_ptr<Token> b(new Token("\"hola\""));
+        std::shared_ptr<Token> op (new Token("+"));
+
+        std::shared_ptr<ValueExpr> left (new ValueExpr(a));
+        std::shared_ptr<ValueExpr> right (new ValueExpr(b));
+
+
+        test = (BinaryExpr(left, right, op)).evaluate();
+        std::cout << std::string(*test) << "\n";
+    }
+    catch (ExpressionEvaluationException& e) {
+        std::cout << e.what() << "\n";
+    }
+    catch (OperationTypeException& e) {
+        std::cout << e.what() << "\n";
+    }
+
     return 0;
 }
