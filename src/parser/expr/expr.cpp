@@ -53,19 +53,23 @@ shared_ptr<Variable> BinaryExpr::evaluate() {
             out = shared_ptr<Variable> (new Variable(leftSide + rightSide));
             break;
         case TokenType::MINUS:
-            out = shared_ptr<Variable> (new Variable((*(l->evaluate()) - *(r->evaluate()))));
+            out = shared_ptr<Variable> (new Variable(leftSide - rightSide));
             break;
         case TokenType::STAR:
-            out = shared_ptr<Variable> (new Variable((*(l->evaluate()) * *(r->evaluate()))));
+            out = shared_ptr<Variable> (new Variable(leftSide * rightSide));
             break;
         case TokenType::SLASH:
-            out = shared_ptr<Variable> (new Variable((*(l->evaluate()) / *(r->evaluate()))));
+            out = shared_ptr<Variable> (new Variable(leftSide / rightSide));
             break;
         case TokenType::MOD:
-            out = shared_ptr<Variable> (new Variable((*(l->evaluate()) % *(r->evaluate()))));
+            out = shared_ptr<Variable> (new Variable(leftSide % rightSide));
             break;
         default:
             throw ExpressionEvaluationException("Invalid binary operator.");
     }
     return out;
+}
+
+shared_ptr<Variable> GroupExpr::evaluate() {
+    return shared_ptr<Variable> (new Variable(*expr->evaluate()));
 }

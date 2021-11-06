@@ -31,6 +31,7 @@ enum class TokenType {
 
 std::string toString(const TokenType& tp);
 
+
 class Token {
     private:
         TokenType type;
@@ -42,19 +43,27 @@ class Token {
         std::string identifierName;
 
     public:
-        operator std::string();
+        
         
         Token(TokenType type);
         Token(std::string token);
+        Token(const Token& other);
 
-        TokenType getType();
-        int getInt();
-        double getDouble();
-        bool getBool();
-        std::string getString();
-        std::string getName();
+        TokenType getType() const;
+        int getInt() const;
+        double getDouble() const;
+        bool getBool() const;
+        std::string getString() const;
+        std::string getName() const;
+
+        bool isLiteral() const;
+        bool isOperator() const;
+
+        void nullify();
 
 };
+
+std::string toString(const Token& tk);
 
 struct NumberFormatException : public std::exception {
     std::string message;

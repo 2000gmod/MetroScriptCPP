@@ -8,7 +8,6 @@ using std::vector;
 string preProcessString(string line);
 vector<string> preTokenize(string line);
 
-
 vector<Token> tokenizeString(string input) {
     vector<Token> out;
     vector<string> preTokens = preTokenize(input);

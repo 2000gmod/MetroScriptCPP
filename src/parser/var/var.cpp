@@ -23,6 +23,30 @@ Variable::Variable(Variable&& other) {
     stringValue = other.stringValue;
 }
 
+Variable::Variable(Token& token) {
+    if (!token.isLiteral()) throw std::exception();
+
+    switch (token.getType()) {
+        case TokenType::INT_LIT:
+            activeMember = 'i';
+            intValue = token.getInt();
+            return;
+        case TokenType::DOUBLE_LIT:
+            activeMember = 'd';
+            doubleValue = token.getDouble();
+            return;
+        case TokenType::BOOL_LIT:
+            activeMember = 'b';
+            boolValue = token.getBool();
+            return;
+        case TokenType::STRING_LIT:
+            activeMember = 's';
+            stringValue = token.getString();
+            return;
+        default: throw std::exception();
+    }
+}
+
 Variable::Variable(int intValue) {
     activeMember = 'i';
     this->intValue = intValue;

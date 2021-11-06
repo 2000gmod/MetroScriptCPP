@@ -4,6 +4,8 @@
 #include <string>
 #include <exception>
 
+#include "../token/token.hpp"
+
 struct OperationTypeException : public std::exception {
     std::string message;
     explicit OperationTypeException(const std::string& message) {
@@ -25,6 +27,7 @@ struct Variable {
     Variable();
     Variable(const Variable& other);
     Variable(Variable&& other);
+    Variable(Token& token);
     Variable(int intValue);
     Variable(double doubleValue);
     Variable(bool boolValue);

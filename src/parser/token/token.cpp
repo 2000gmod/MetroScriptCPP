@@ -148,16 +148,17 @@ bool isValidIdentifier(string str) {
     return true;
 }
 
-Token::operator std::string() {
+string toString(const Token& tk) {
+    TokenType type = tk.getType();
     string out = toString(type);
 
     switch(type) {
         default: break;
-        case TokenType::INT_LIT: out += ": " + std::to_string(intValue); break;
-        case TokenType::DOUBLE_LIT: out += ": " + std::to_string(doubleValue); break;
-        case TokenType::BOOL_LIT: out += ": " + std::to_string(boolValue); break;
-        case TokenType::STRING_LIT: out += ": \"" + stringValue + "\""; break;
-        case TokenType::IDENTIFIER: out += ": " + identifierName; break;
+        case TokenType::INT_LIT: out += ": " + std::to_string(tk.getInt()); break;
+        case TokenType::DOUBLE_LIT: out += ": " + std::to_string(tk.getDouble()); break;
+        case TokenType::BOOL_LIT: out += ": " + std::to_string(tk.getBool()); break;
+        case TokenType::STRING_LIT: out += ": \"" + tk.getString() + "\""; break;
+        case TokenType::IDENTIFIER: out += ": " + tk.getName(); break;
     }
     return out;
 }
@@ -167,6 +168,7 @@ Token::Token(TokenType type) {
 }
 
 int parseInt(string str) {
+    if (str[0] == '+' || str[0] == '-') throw NumberFormatException("Invalid initial sign.");
     char *check;
     long number = strtol(str.c_str(), &check, 10);
 
@@ -180,6 +182,7 @@ int parseInt(string str) {
 }
 
 double parseDouble(string str) {
+    if (str[0] == '+' || str[0] == '-') throw NumberFormatException("Invalid initial sign.");
     char *check;
     double number = strtod(str.c_str(), &check);
 
@@ -272,26 +275,78 @@ Token::Token(string token) {
 
 }
 
-TokenType Token::getType() {
+Token::Token(const Token& other) {
+    type = other.getType();
+    switch (type) {
+        case TokenType::INT_LIT:
+            intValue = other.intValue;
+            return;
+        case TokenType::DOUBLE_LIT:
+            doubleValue = other.doubleValue;
+            return;
+        case TokenType::BOOL_LIT:
+            boolValue = other.boolValue;
+            return;
+        case TokenType::STRING_LIT:
+            stringValue = other.stringValue;
+            return;
+        case TokenType::IDENTIFIER:
+            identifierName = other.identifierName;
+            return;
+        default:
+            return;
+    }
+}
+
+TokenType Token::getType() const {
     return type;
 }
 
-int Token::getInt() {
+int Token::getInt() const {
     return intValue;
 }
 
-double Token::getDouble() {
+double Token::getDouble() const {
     return doubleValue;
 }
 
-bool Token::getBool() {
+bool Token::getBool() const {
     return boolValue;
 }
 
-string Token::getString() {
+string Token::getString() const {
     return stringValue;
 }
 
-string Token::getName() {
+string Token::getName() const {
     return identifierName;
+}
+
+bool Token::isLiteral() const {
+    switch (type) {
+        case TokenType::INT_LIT:
+        case TokenType::BOOL_LIT:
+        case TokenType::DOUBLE_LIT:
+        case TokenType::STRING_LIT:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool Token::isOperator() const {
+    switch (type) {
+        case TokenType::PLUS:
+        case TokenType::MINUS:
+        case TokenType::STAR:
+        case TokenType::SLASH:
+        case TokenType::MOD:
+            return true;
+        default:
+            return false;
+    }
+}
+
+void Token::nullify() {
+    type = TokenType::EOFILE;
 }
