@@ -4,7 +4,6 @@
 using std::shared_ptr;
 
 shared_ptr<Variable> evaluate(shared_ptr<Expression> expr) {
-
     Expression* ptr = expr.get();
 
     if (instanceOf<ValueExpr>(ptr)) {

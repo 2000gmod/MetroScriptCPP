@@ -1,4 +1,5 @@
 #include "token.hpp"
+#include "../../util/util.hpp"
 
 using std::string;
 
@@ -170,7 +171,15 @@ Token::Token(TokenType type) {
 int parseInt(string str) {
     if (str[0] == '+' || str[0] == '-') throw NumberFormatException("Invalid initial sign.");
     char *check;
-    long number = strtol(str.c_str(), &check, 10);
+    long number;
+    if (str.substr(0, 2) == "0x") {
+        number = strtol(str.substr(2).c_str(), &check, 16);
+    }
+    else if (str.substr(0, 2) == "0b") {
+        number = strtol(str.substr(2).c_str(), &check, 2);
+    }
+
+    else number = strtol(str.c_str(), &check, 10);
 
     if (check[0] != '\0') {
         throw NumberFormatException("Invalid int.");
@@ -206,11 +215,56 @@ bool isStringLit(string token) {
     return false;
 }
 
+void Token::formatEscapeSeqs() {
+    auto size = stringValue.size();
+    string out;
+
+    for (unsigned long i = 0; i < size; i++) {
+        char c = stringValue[i];
+        if(c == '\\' && i != size - 1) {
+            switch (stringValue[i + 1]) {
+                case 'a':
+                    out += '\a';
+                    break;
+                case 'b':
+                    out += '\b';
+                    break;
+                case 't':
+                    out += '\t';
+                    break;
+                case 'n':
+                    out += '\n';
+                    break;
+                case 'v':
+                    out += '\v';
+                    break;
+                case 'f':
+                    out += '\f';
+                    break;
+                case 'r':
+                    out += '\r';
+                    break;
+                case '\\':
+                    out += '\\';
+                    break;
+                default:
+                    reportError("\\" + std::to_string(stringValue[i + 1]) + " is not a valid escape code", 0);
+                    type = TokenType::ERROR;
+                    return;
+            }
+            i += 1;
+        }
+        else out += c;
+    }
+    stringValue = out;
+}
+
 Token::Token(string token) {
     
     if (isStringLit(token)) {
         type = TokenType::STRING_LIT;
         stringValue = token.substr(1, token.length() - 2);
+        formatEscapeSeqs();
         return;
     }
 

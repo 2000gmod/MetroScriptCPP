@@ -6,6 +6,7 @@ using std::string;
 using std::vector;
 
 string preProcessString(string line);
+string removeComments(string line);
 vector<string> preTokenize(string line);
 
 vector<Token> tokenizeString(string input) {
@@ -59,24 +60,9 @@ vector<string> preTokenize(string line) {
     return out;
 }
 
-char handleEscape(char c) {
-    switch (c) {
-        case 'a': return '\a';
-        case 'b': return '\b';
-        case 'f': return '\f';
-        case 'n': return '\n';
-        case 'r': return '\r';
-        case 't': return '\t';
-        case 'v': return '\v';
-        case '\'': return '\'';
-        case '\"': return '\"';
-        case '?': return '\?';
-        case '\\': return '\\';
-    }
-    return 0;
-}
 
 string preProcessString(string line) {
+    line = removeComments(line);
     string out;
     bool writing = false;
     bool isInsideString = false;
@@ -86,6 +72,38 @@ string preProcessString(string line) {
         if (c == '\"') isInsideString = !isInsideString;
         if (writing || isInsideString) {
             out += c;
+        }
+    }
+    return out;
+}
+
+#include <iostream>
+
+string removeComments(string line) {
+    string out;
+    bool writing = true;
+    auto size = line.size();
+
+    const string beginComment = "/";
+    const string endComment = "/";
+
+    if (beginComment != endComment) {
+        for (unsigned long i = 0; i < size; i++) {
+            if (line.substr(i, beginComment.size()) == beginComment) writing = false;
+            else if (line.substr(i, endComment.size()) == endComment) {
+                writing = true;
+                i += endComment.size();
+            }
+            if (writing) out += line[i];
+        }
+    }
+    else {
+        for (unsigned long i = 0; i < size; i++) {
+            if (line.substr(i, beginComment.size()) == beginComment) {
+                writing = !writing;
+                i += beginComment.size();
+            }
+            if (writing) out += line[i];
         }
     }
     return out;

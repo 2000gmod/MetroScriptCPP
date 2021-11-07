@@ -42,6 +42,8 @@ class Token {
 
         std::string identifierName;
 
+        void formatEscapeSeqs();
+
     public:
         
         

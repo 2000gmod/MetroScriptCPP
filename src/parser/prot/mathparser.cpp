@@ -52,8 +52,6 @@ std::shared_ptr<Expression> parseMath(Token* tokensPtr) {
             tokensPtr[i].nullify();
             Token* opPtr = type == TokenType::PLUS ? new Token("+") : new Token("-");
 
-
-
             std::shared_ptr<Token> op (opPtr);
             std::shared_ptr<Expression> left(parseMath(tokensPtr));
             std::shared_ptr<Expression> right(parseMath(&tokensPtr[i + 1]));
