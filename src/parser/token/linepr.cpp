@@ -59,13 +59,34 @@ vector<string> preTokenize(string line) {
     return out;
 }
 
+char handleEscape(char c) {
+    switch (c) {
+        case 'a': return '\a';
+        case 'b': return '\b';
+        case 'f': return '\f';
+        case 'n': return '\n';
+        case 'r': return '\r';
+        case 't': return '\t';
+        case 'v': return '\v';
+        case '\'': return '\'';
+        case '\"': return '\"';
+        case '?': return '\?';
+        case '\\': return '\\';
+    }
+    return 0;
+}
+
 string preProcessString(string line) {
     string out;
     bool writing = false;
+    bool isInsideString = false;
 
     for (char c : line) {
-        if (c != ' ') writing = true;
-        if (writing) out += c;
+        writing = c != ' ';
+        if (c == '\"') isInsideString = !isInsideString;
+        if (writing || isInsideString) {
+            out += c;
+        }
     }
     return out;
 }

@@ -194,8 +194,21 @@ double parseDouble(string str) {
     return number;
 }
 
+bool isStringLit(string token) {
+    if (token.length() <= 1) return false;
+
+    int quotesAmount = 0;
+    for (char c : token) {
+        if (c == '\"') quotesAmount++; 
+    }
+    if (quotesAmount != 2) return false;
+    if (token[0] == '\"' && token[token.length() - 1] == '\"') return true;
+    return false;
+}
+
 Token::Token(string token) {
-    if (token[0] == '\"' && token[token.length() - 1] == '\"' && token.length() > 1) {
+    
+    if (isStringLit(token)) {
         type = TokenType::STRING_LIT;
         stringValue = token.substr(1, token.length() - 2);
         return;

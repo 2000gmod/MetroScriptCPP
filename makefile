@@ -1,7 +1,7 @@
 TARGET = $(OUTDIR)/msppi
 
 CC = g++
-CFLAGS = -Wall -Wextra -Wpedantic -MMD -O3
+CFLAGS = -Wall -Wextra -Wpedantic -MMD -O2
 
 
 OBJDIR = obj

@@ -34,7 +34,10 @@ std::shared_ptr<Expression> parseMath(Token* tokensPtr) {
         return std::shared_ptr<ValueExpr>(new ValueExpr(std::shared_ptr<Token>(copy)));
     }
 
-    if (tokensPtr[0].getType() == TokenType::LEFT_PAREN && tokensPtr[size - 1].getType() == TokenType::RIGHT_PAREN && findMatchingParenthesisIndex(tokensPtr, 0) == size - 1) {
+    if (tokensPtr[0].getType() == TokenType::LEFT_PAREN 
+            && tokensPtr[size - 1].getType() == TokenType::RIGHT_PAREN 
+            && findMatchingParenthesisIndex(tokensPtr, 0) == size - 1) {
+                
         tokensPtr[size - 1].nullify();
         return std::shared_ptr<GroupExpr>(new GroupExpr(std::shared_ptr<Expression>(parseMath(&tokensPtr[1]))));
     }
