@@ -10,6 +10,7 @@ SRCDIR = src
 OUTDIR = out
 
 SOURCES := $(shell find . -name '*.cpp')
+HEADERS:= $(shell find . -name '*.hpp')
 OBJECTS := $(subst .cpp,.o, $(subst ./src,./$(OBJDIR),$(SOURCES)))
 DEPS := $(shell find . -name '*.d')
 
@@ -35,7 +36,7 @@ $(OBJDIR):
 	$(shell rsync -a --include='*/' --exclude='*' $(SRCDIR)/ $(OBJDIR)/)
 
 
-.PHONY: clean deepclean run debug
+.PHONY: clean deepclean run debug format
 
 run: $(TARGET)
 	$(TARGET)
@@ -45,3 +46,6 @@ clean:
 
 deepclean: clean
 	rm -rf $(OBJDIR)
+
+format:
+	clang-format-13 -style=file $(SOURCES) $(HEADERS) -i

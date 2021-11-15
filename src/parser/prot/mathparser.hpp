@@ -3,9 +3,9 @@
 
 #include <vector>
 
+#include "../expr/expr.hpp"
 #include "../token/token.hpp"
 #include "../var/var.hpp"
-#include "../expr/expr.hpp"
 
-std::shared_ptr<Expression> parseMath(Token* tokenPtr);
+std::shared_ptr<Expression> parseMath (Token *tokenPtr);
 #endif

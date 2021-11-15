@@ -1,0 +1,39 @@
+﻿---
+BasedOnStyle: Google
+AccessModifierOffset: 0
+AlignConsecutiveDeclarations: ACS_AcrossEmptyLinesAndComments
+AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
+AlignConsecutiveMacros: AcrossEmptyLinesAndComments
+AlignEscapedNewlines: Left
+AlignOperands: AlignAfterOperator
+AlignTrailingComments: true
+AlignAfterOpenBracket: Align
+AllowShortBlocksOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+FixNamespaceComments: true
+IndentCaseLabels: true
+IndentWidth: 4
+Language: Cpp
+NamespaceIndentation: All
+PointerAlignment: Right
+DerivePointerAlignment: false
+ReflowComments: true
+SortIncludes: true
+SpaceAfterCStyleCast: true
+SpaceAfterTemplateKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: Always
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyParentheses: false
+TabWidth: 4
+ColumnLimit: 120
+KeepEmptyLinesAtTheStartOfBlocks: true
+
+IndentAccessModifiers: true
+BreakBeforeBinaryOperators: NonAssignment
+
+AlignArrayOfStructures: Right
+...

@@ -1,89 +1,105 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include <string>
-#include <ostream>
 #include <exception>
-
+#include <ostream>
+#include <string>
 
 enum class TokenType {
-    PLUS, MINUS, STAR, SLASH,
-    COMMA, DOT, MOD,
+    PLUS,
+    MINUS,
+    STAR,
+    SLASH,
+    COMMA,
+    DOT,
+    MOD,
 
-    ASSIGN, EQ, NOT_EQ,
-    LT, GT, LEQ, GEQ, SEMICOLON,
+    ASSIGN,
+    EQ,
+    NOT_EQ,
+    LT,
+    GT,
+    LEQ,
+    GEQ,
+    SEMICOLON,
 
-    AND, NOT, OR,
+    AND,
+    NOT,
+    OR,
 
-    LEFT_PAREN, RIGHT_PAREN, LEFT_SQR, RIGHT_SQR, LEFT_CUR, RIGHT_CUR,
+    LEFT_PAREN,
+    RIGHT_PAREN,
+    LEFT_SQR,
+    RIGHT_SQR,
+    LEFT_CUR,
+    RIGHT_CUR,
 
-    IF, ELSE, FOR, WHILE, BREAK, CONTINUE,
+    IF,
+    ELSE,
+    FOR,
+    WHILE,
+    BREAK,
+    CONTINUE,
 
+    INT,
+    DOUBLE,
+    BOOL,
+    STRING,
 
-    INT, DOUBLE, BOOL, STRING,
-
-    INT_LIT, DOUBLE_LIT, BOOL_LIT, STRING_LIT,
+    INT_LIT,
+    DOUBLE_LIT,
+    BOOL_LIT,
+    STRING_LIT,
     IDENTIFIER,
 
     RETURN,
-    ERROR, EOFILE
+    ERROR,
+    EOFILE
 };
 
-std::string toString(const TokenType& tp);
-
+std::string toString (const TokenType &tp);
 
 class Token {
     private:
-        TokenType type;
-        int intValue;
-        double doubleValue;
-        bool boolValue;
+        TokenType   type;
+        int         intValue;
+        double      doubleValue;
+        bool        boolValue;
         std::string stringValue;
 
         std::string identifierName;
 
-        void formatEscapeSeqs();
+        void        formatEscapeSeqs ();
 
     public:
-        
-        
-        Token(TokenType type);
-        Token(std::string token);
-        Token(const Token& other);
+        Token (TokenType type);
+        Token (std::string token);
+        Token (const Token &other);
 
-        TokenType getType() const;
-        int getInt() const;
-        double getDouble() const;
-        bool getBool() const;
-        std::string getString() const;
-        std::string getName() const;
+        TokenType   getType () const;
+        int         getInt () const;
+        double      getDouble () const;
+        bool        getBool () const;
+        std::string getString () const;
+        std::string getName () const;
 
-        bool isLiteral() const;
-        bool isOperator() const;
+        bool        isLiteral () const;
+        bool        isOperator () const;
 
-        void nullify();
-
+        void        nullify ();
 };
 
-std::string toString(const Token& tk);
+std::string toString (const Token &tk);
 
 struct NumberFormatException : public std::exception {
-    std::string message;
-    NumberFormatException(std::string message) {this->message = message;}
-    const char *what() const throw() {
-        return message.c_str();
-    }
+        std::string message;
+        NumberFormatException (std::string message) { this->message = message; }
+        const char *what () const throw () { return message.c_str (); }
 };
 
-std::ostream& operator << (std::ostream&, Token&);
+std::ostream     &operator<< (std::ostream &, Token &);
 
-const std::string keywords[] = {
-    "for", "while", "if", "else",
-    "and", "or", "not", "return",
-    "break", "continue",
-    "int", "double", "bool", "string",
-    "true", "false"
-};
-
+const std::string keywords[] = {"for",   "while",    "if",  "else",   "and",  "or",     "not",  "return",
+                                "break", "continue", "int", "double", "bool", "string", "true", "false"};
 
 #endif
