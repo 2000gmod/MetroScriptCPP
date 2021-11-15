@@ -4,7 +4,7 @@
 
 using std::string;
 
-string toString (const TokenType &tp) {
+string toString(const TokenType &tp) {
     string out = "";
 
     switch (tp) {
@@ -138,82 +138,87 @@ string toString (const TokenType &tp) {
     return out;
 }
 
-bool isValidIdentifier (string str) {
+bool isValidIdentifier(string str) {
     if (str[0] >= '0' && str[0] <= '9') return false;
 
     for (string s : keywords) {
         if (str == s) return false;
     }
     for (char c : str) {
-        if ((!isalnum (c) || (c == '_')) || c == ';' || c == '\"' || c == ' ') return false;
+        if ((!isalnum(c) || (c == '_')) || c == ';' || c == '\"' || c == ' ') return false;
     }
     return true;
 }
 
-string toString (const Token &tk) {
-    TokenType type = tk.getType ();
-    string    out = toString (type);
+string toString(const Token &tk) {
+    TokenType type = tk.getType();
+    string    out = toString(type);
 
     switch (type) {
         default:
             break;
         case TokenType::INT_LIT:
-            out += ": " + std::to_string (tk.getInt ());
+            out += ": " + std::to_string(tk.getInt());
             break;
         case TokenType::DOUBLE_LIT:
-            out += ": " + std::to_string (tk.getDouble ());
+            out += ": " + std::to_string(tk.getDouble());
             break;
         case TokenType::BOOL_LIT:
-            out += ": " + std::to_string (tk.getBool ());
+            out += ": " + std::to_string(tk.getBool());
             break;
         case TokenType::STRING_LIT:
-            out += ": \"" + tk.getString () + "\"";
+            out += ": \"" + tk.getString() + "\"";
             break;
         case TokenType::IDENTIFIER:
-            out += ": " + tk.getName ();
+            out += ": " + tk.getName();
             break;
     }
     return out;
 }
 
-Token::Token (TokenType type) { this->type = type; }
+Token::Token(TokenType type) { this->type = type; }
 
-int parseInt (string str) {
-    if (str[0] == '+' || str[0] == '-') throw NumberFormatException ("Invalid initial sign.");
+int parseInt(string str) {
+    if (str[0] == '+' || str[0] == '-') throw NumberFormatException("Invalid initial sign.");
     char *check;
     long  number;
-    if (str.substr (0, 2) == "0x") {
-        number = strtol (str.substr (2).c_str (), &check, 16);
-    } else if (str.substr (0, 2) == "0b") {
-        number = strtol (str.substr (2).c_str (), &check, 2);
+    if (str.substr(0, 2) == "0x") {
+        number = strtol(str.substr(2).c_str(), &check, 16);
+    }
+    else if (str.substr(0, 2) == "0b") {
+        number = strtol(str.substr(2).c_str(), &check, 2);
     }
 
     else
-        number = strtol (str.c_str (), &check, 10);
+        number = strtol(str.c_str(), &check, 10);
 
-    if (check[0] != '\0') { throw NumberFormatException ("Invalid int."); }
+    if (check[0] != '\0') {
+        throw NumberFormatException("Invalid int.");
+    }
 
-    if (number < 0) throw NumberFormatException ("Negative.");
+    if (number < 0) throw NumberFormatException("Negative.");
 
     return (int) number;
 }
 
-double parseDouble (string str) {
-    if (str[0] == '+' || str[0] == '-') throw NumberFormatException ("Invalid initial sign.");
+double parseDouble(string str) {
+    if (str[0] == '+' || str[0] == '-') throw NumberFormatException("Invalid initial sign.");
     char  *check;
-    double number = strtod (str.c_str (), &check);
+    double number = strtod(str.c_str(), &check);
 
-    if (check[0] != '\0') { throw NumberFormatException ("Invalid double."); }
+    if (check[0] != '\0') {
+        throw NumberFormatException("Invalid double.");
+    }
 
-    if (number < 0) throw NumberFormatException ("Negative.");
+    if (number < 0) throw NumberFormatException("Negative.");
     return number;
 }
 
-bool isStringLit (string token) {
-    if (token.length () <= 1) return false;
+bool isStringLit(string token) {
+    if (token.length() <= 1) return false;
 
     int quotesAmount = 0;
-    for (unsigned int i = 0; i < token.length (); i++) {
+    for (unsigned int i = 0; i < token.length(); i++) {
         char c = token[i];
         if (c == '\"')
             quotesAmount++;
@@ -221,12 +226,12 @@ bool isStringLit (string token) {
             quotesAmount--;
     }
     if (quotesAmount != 2) return false;
-    if (token[0] == '\"' && token[token.length () - 1] == '\"') return true;
+    if (token[0] == '\"' && token[token.length() - 1] == '\"') return true;
     return false;
 }
 
-void Token::formatEscapeSeqs () {
-    auto   size = stringValue.size ();
+void Token::formatEscapeSeqs() {
+    auto   size = stringValue.size();
     string out;
 
     for (unsigned long i = 0; i < size; i++) {
@@ -264,132 +269,162 @@ void Token::formatEscapeSeqs () {
                     out += '\'';
                     break;
                 default:
-                    reportError ("\\" + std::to_string (stringValue[i + 1]) + " is not a valid escape code");
+                    reportError("\\" + std::to_string(stringValue[i + 1]) + " is not a valid escape code");
                     type = TokenType::ERROR;
                     return;
             }
             i += 1;
-        } else
+        }
+        else
             out += c;
     }
     stringValue = out;
 }
 
-Token::Token (string token) {
-    if (isStringLit (token)) {
+Token::Token(string token) {
+    if (isStringLit(token)) {
         type = TokenType::STRING_LIT;
-        stringValue = token.substr (1, token.length () - 2);
-        formatEscapeSeqs ();
+        stringValue = token.substr(1, token.length() - 2);
+        formatEscapeSeqs();
         return;
     }
 
     try {
-        intValue = parseInt (token);
+        intValue = parseInt(token);
         type = TokenType::INT_LIT;
         return;
-    } catch (NumberFormatException &ignored) {}
+    } catch (NumberFormatException &ignored) {
+    }
 
     try {
-        doubleValue = parseDouble (token);
+        doubleValue = parseDouble(token);
         type = TokenType::DOUBLE_LIT;
         return;
-    } catch (NumberFormatException &ignored) {}
+    } catch (NumberFormatException &ignored) {
+    }
 
-    if (token == "+")
+    if (token == "+") {
         type = TokenType::PLUS;
-    else if (token == "-")
+    }
+    else if (token == "-") {
         type = TokenType::MINUS;
-    else if (token == "*")
+    }
+    else if (token == "*") {
         type = TokenType::STAR;
-    else if (token == "/")
+    }
+    else if (token == "/") {
         type = TokenType::SLASH;
-    else if (token == ",")
+    }
+    else if (token == ",") {
         type = TokenType::COMMA;
-    else if (token == ".")
+    }
+    else if (token == ".") {
         type = TokenType::DOT;
-    else if (token == "%")
+    }
+    else if (token == "%") {
         type = TokenType::MOD;
-
-    else if (token == "=")
+    }
+    else if (token == "=") {
         type = TokenType::ASSIGN;
-    else if (token == "==")
+    }
+    else if (token == "==") {
         type = TokenType::EQ;
-    else if (token == "!=")
+    }
+    else if (token == "!=") {
         type = TokenType::NOT_EQ;
-    else if (token == "<")
+    }
+    else if (token == "<") {
         type = TokenType::LT;
-    else if (token == ">")
+    }
+    else if (token == ">") {
         type = TokenType::GT;
-    else if (token == "<=")
+    }
+    else if (token == "<=") {
         type = TokenType::LEQ;
-    else if (token == ">=")
+    }
+    else if (token == ">=") {
         type = TokenType::GEQ;
-
-    else if (token == ";")
+    }
+    else if (token == ";") {
         type = TokenType::SEMICOLON;
-
-    else if (token == "&&" || token == "and")
+    }
+    else if (token == "&&" || token == "and") {
         type = TokenType::AND;
-    else if (token == "!" || token == "not")
+    }
+    else if (token == "!" || token == "not") {
         type = TokenType::NOT;
-    else if (token == "||" || token == "or")
+    }
+    else if (token == "||" || token == "or") {
         type = TokenType::OR;
-
-    else if (token == "(")
+    }
+    else if (token == "(") {
         type = TokenType::LEFT_PAREN;
-    else if (token == ")")
+    }
+    else if (token == ")") {
         type = TokenType::RIGHT_PAREN;
-    else if (token == "[")
+    }
+    else if (token == "[") {
         type = TokenType::LEFT_SQR;
-    else if (token == "]")
+    }
+    else if (token == "]") {
         type = TokenType::RIGHT_SQR;
-    else if (token == "{")
+    }
+    else if (token == "{") {
         type = TokenType::LEFT_CUR;
-    else if (token == "}")
+    }
+    else if (token == "}") {
         type = TokenType::RIGHT_CUR;
-
-    else if (token == "if")
+    }
+    else if (token == "if") {
         type = TokenType::IF;
-    else if (token == "else")
+    }
+    else if (token == "else") {
         type = TokenType::ELSE;
-    else if (token == "for")
+    }
+    else if (token == "for") {
         type = TokenType::FOR;
-    else if (token == "while")
+    }
+    else if (token == "while") {
         type = TokenType::WHILE;
-    else if (token == "break")
+    }
+    else if (token == "break") {
         type = TokenType::BREAK;
-    else if (token == "continue")
+    }
+    else if (token == "continue") {
         type = TokenType::CONTINUE;
-
-    else if (token == "int")
+    }
+    else if (token == "int") {
         type = TokenType::INT;
-    else if (token == "double")
+    }
+    else if (token == "double") {
         type = TokenType::DOUBLE;
-    else if (token == "bool")
+    }
+    else if (token == "bool") {
         type = TokenType::BOOL;
-    else if (token == "string")
+    }
+    else if (token == "string") {
         type = TokenType::STRING;
-
-    else if (token == "return")
+    }
+    else if (token == "return") {
         type = TokenType::RETURN;
-
+    }
     else if (token == "true" || token == "false") {
         type = TokenType::BOOL_LIT;
         boolValue = (token == "true") ? true : false;
     }
-
     else {
-        if (isValidIdentifier (token)) {
+        if (isValidIdentifier(token)) {
             type = TokenType::IDENTIFIER;
             identifierName = token;
-        } else {
+        }
+        else {
             type = TokenType::ERROR;
         }
     }
 }
 
-Token::Token (const Token &other) {
-    type = other.getType ();
+Token::Token(const Token &other) {
+    type = other.getType();
     switch (type) {
         case TokenType::INT_LIT:
             intValue = other.intValue;
@@ -411,19 +446,19 @@ Token::Token (const Token &other) {
     }
 }
 
-TokenType Token::getType () const { return type; }
+TokenType Token::getType() const { return type; }
 
-int       Token::getInt () const { return intValue; }
+int       Token::getInt() const { return intValue; }
 
-double    Token::getDouble () const { return doubleValue; }
+double    Token::getDouble() const { return doubleValue; }
 
-bool      Token::getBool () const { return boolValue; }
+bool      Token::getBool() const { return boolValue; }
 
-string    Token::getString () const { return stringValue; }
+string    Token::getString() const { return stringValue; }
 
-string    Token::getName () const { return identifierName; }
+string    Token::getName() const { return identifierName; }
 
-bool      Token::isLiteral () const {
+bool      Token::isLiteral() const {
     switch (type) {
         case TokenType::INT_LIT:
         case TokenType::BOOL_LIT:
@@ -435,7 +470,7 @@ bool      Token::isLiteral () const {
     }
 }
 
-bool Token::isOperator () const {
+bool Token::isOperator() const {
     switch (type) {
         case TokenType::PLUS:
         case TokenType::MINUS:
@@ -448,4 +483,4 @@ bool Token::isOperator () const {
     }
 }
 
-void Token::nullify () { type = TokenType::EOFILE; }
+void Token::nullify() { type = TokenType::EOFILE; }

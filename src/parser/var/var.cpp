@@ -2,12 +2,12 @@
 
 #include <iostream>
 
-Variable::Variable () {
+Variable::Variable() {
     activeMember = 'i';
     intValue = 0;
 }
 
-Variable::Variable (const Variable &other) {
+Variable::Variable(const Variable &other) {
     activeMember = other.activeMember;
     intValue = other.intValue;
     doubleValue = other.doubleValue;
@@ -15,7 +15,7 @@ Variable::Variable (const Variable &other) {
     stringValue = other.stringValue;
 }
 
-Variable::Variable (Variable &&other) {
+Variable::Variable(Variable &&other) {
     activeMember = other.activeMember;
     intValue = other.intValue;
     doubleValue = other.doubleValue;
@@ -23,57 +23,57 @@ Variable::Variable (Variable &&other) {
     stringValue = other.stringValue;
 }
 
-Variable::Variable (Token &token) {
-    if (!token.isLiteral ()) throw std::exception ();
+Variable::Variable(Token &token) {
+    if (!token.isLiteral()) throw std::exception();
 
-    switch (token.getType ()) {
+    switch (token.getType()) {
         case TokenType::INT_LIT:
             activeMember = 'i';
-            intValue = token.getInt ();
+            intValue = token.getInt();
             return;
         case TokenType::DOUBLE_LIT:
             activeMember = 'd';
-            doubleValue = token.getDouble ();
+            doubleValue = token.getDouble();
             return;
         case TokenType::BOOL_LIT:
             activeMember = 'b';
-            boolValue = token.getBool ();
+            boolValue = token.getBool();
             return;
         case TokenType::STRING_LIT:
             activeMember = 's';
-            stringValue = token.getString ();
+            stringValue = token.getString();
             return;
         default:
-            throw std::exception ();
+            throw std::exception();
     }
 }
 
-Variable::Variable (int intValue) {
+Variable::Variable(int intValue) {
     activeMember = 'i';
     this->intValue = intValue;
 }
 
-Variable::Variable (double doubleValue) {
+Variable::Variable(double doubleValue) {
     activeMember = 'd';
     this->doubleValue = doubleValue;
 }
 
-Variable::Variable (bool boolValue) {
+Variable::Variable(bool boolValue) {
     activeMember = 'b';
     this->boolValue = boolValue;
 }
 
-Variable::Variable (std::string stringValue) {
+Variable::Variable(std::string stringValue) {
     activeMember = 's';
     this->stringValue = stringValue;
 }
 
-Variable::operator std::string () {
+Variable::operator std::string() {
     switch (activeMember) {
         case 'i':
-            return std::to_string (intValue);
+            return std::to_string(intValue);
         case 'd':
-            return std::to_string (doubleValue);
+            return std::to_string(doubleValue);
         case 'b':
             if (boolValue)
                 return "true";
@@ -86,48 +86,48 @@ Variable::operator std::string () {
     }
 }
 
-Variable operator+ (Variable &a, Variable &b) {
+Variable operator+(Variable &a, Variable &b) {
     switch (a.activeMember) {
         case 'i':
             if (b.activeMember == 'i')
-                return Variable (a.intValue + b.intValue);
+                return Variable(a.intValue + b.intValue);
             else if (b.activeMember == 'd')
-                return Variable (a.intValue + b.doubleValue);
+                return Variable(a.intValue + b.doubleValue);
             else
                 goto error;
         case 'd':
             if (b.activeMember == 'i')
-                return Variable (a.doubleValue + b.intValue);
+                return Variable(a.doubleValue + b.intValue);
             else if (b.activeMember == 'd')
-                return Variable (a.doubleValue + b.doubleValue);
+                return Variable(a.doubleValue + b.doubleValue);
             else
                 goto error;
         case 'b':
             goto error;
         case 's':
             if (b.activeMember == 's')
-                return Variable (a.stringValue + b.stringValue);
+                return Variable(a.stringValue + b.stringValue);
             else
                 goto error;
     }
 error:
-    throw OperationTypeException ("Invalid types for (+) operator.");
+    throw OperationTypeException("Invalid types for (+) operator.");
 }
 
-Variable operator- (Variable &a, Variable &b) {
+Variable operator-(Variable &a, Variable &b) {
     switch (a.activeMember) {
         case 'i':
             if (b.activeMember == 'i')
-                return Variable (a.intValue - b.intValue);
+                return Variable(a.intValue - b.intValue);
             else if (b.activeMember == 'd')
-                return Variable (a.intValue - b.doubleValue);
+                return Variable(a.intValue - b.doubleValue);
             else
                 goto error;
         case 'd':
             if (b.activeMember == 'i')
-                return Variable (a.doubleValue - b.intValue);
+                return Variable(a.doubleValue - b.intValue);
             else if (b.activeMember == 'd')
-                return Variable (a.doubleValue - b.doubleValue);
+                return Variable(a.doubleValue - b.doubleValue);
             else
                 goto error;
         case 'b':
@@ -135,23 +135,23 @@ Variable operator- (Variable &a, Variable &b) {
             goto error;
     }
 error:
-    throw OperationTypeException ("Invalid types for (-) operator.");
+    throw OperationTypeException("Invalid types for (-) operator.");
 }
 
-Variable operator* (Variable &a, Variable &b) {
+Variable operator*(Variable &a, Variable &b) {
     switch (a.activeMember) {
         case 'i':
             if (b.activeMember == 'i')
-                return Variable (a.intValue * b.intValue);
+                return Variable(a.intValue * b.intValue);
             else if (b.activeMember == 'd')
-                return Variable (a.intValue * b.doubleValue);
+                return Variable(a.intValue * b.doubleValue);
             else
                 goto error;
         case 'd':
             if (b.activeMember == 'i')
-                return Variable (a.doubleValue * b.intValue);
+                return Variable(a.doubleValue * b.intValue);
             else if (b.activeMember == 'd')
-                return Variable (a.doubleValue * b.doubleValue);
+                return Variable(a.doubleValue * b.doubleValue);
             else
                 goto error;
         case 'b':
@@ -159,22 +159,22 @@ Variable operator* (Variable &a, Variable &b) {
             goto error;
     }
 error:
-    throw OperationTypeException ("Invalid types for (*) operator.");
+    throw OperationTypeException("Invalid types for (*) operator.");
 }
-Variable operator/ (Variable &a, Variable &b) {
+Variable operator/(Variable &a, Variable &b) {
     switch (a.activeMember) {
         case 'i':
             if (b.activeMember == 'i')
-                return Variable (a.intValue / b.intValue);
+                return Variable(a.intValue / b.intValue);
             else if (b.activeMember == 'd')
-                return Variable (a.intValue / b.doubleValue);
+                return Variable(a.intValue / b.doubleValue);
             else
                 goto error;
         case 'd':
             if (b.activeMember == 'i')
-                return Variable (a.doubleValue / b.intValue);
+                return Variable(a.doubleValue / b.intValue);
             else if (b.activeMember == 'd')
-                return Variable (a.doubleValue / b.doubleValue);
+                return Variable(a.doubleValue / b.doubleValue);
             else
                 goto error;
         case 'b':
@@ -182,13 +182,13 @@ Variable operator/ (Variable &a, Variable &b) {
             goto error;
     }
 error:
-    throw OperationTypeException ("Invalid types for (/) operator.");
+    throw OperationTypeException("Invalid types for (/) operator.");
 }
-Variable operator% (Variable &a, Variable &b) {
+Variable operator%(Variable &a, Variable &b) {
     switch (a.activeMember) {
         case 'i':
             if (b.activeMember == 'i')
-                return Variable (a.intValue % b.intValue);
+                return Variable(a.intValue % b.intValue);
             else
                 goto error;
         case 'd':
@@ -197,5 +197,5 @@ Variable operator% (Variable &a, Variable &b) {
             goto error;
     }
 error:
-    throw OperationTypeException ("Invalid types for (%) operator.");
+    throw OperationTypeException("Invalid types for (%) operator.");
 }

@@ -7,5 +7,5 @@
 #include "../token/token.hpp"
 #include "../var/var.hpp"
 
-std::shared_ptr<Expression> parseMath (Token *tokenPtr);
+std::shared_ptr<Expression> parseMath(Token *tokenPtr);
 #endif

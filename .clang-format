@@ -25,15 +25,21 @@ SpaceBeforeAssignmentOperators: true
 SpaceBeforeCpp11BracedList: true
 SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: true
-SpaceBeforeParens: Always
+SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: true
 SpaceInEmptyParentheses: false
 TabWidth: 4
 ColumnLimit: 120
 KeepEmptyLinesAtTheStartOfBlocks: true
 
-IndentAccessModifiers: true
+IndentAccessModifiers: false
 BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterControlStatement: MultiLine
+  BeforeElse: true
 
 AlignArrayOfStructures: Right
+BreakBeforeTernaryOperators: true
+EmptyLineAfterAccessModifier: Never
 ...

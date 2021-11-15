@@ -6,6 +6,6 @@
 
 #include "token.hpp"
 
-std::vector<Token> tokenizeString (std::string input);
+std::vector<Token> tokenizeString(std::string input);
 
 #endif
