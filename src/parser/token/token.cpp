@@ -98,17 +98,8 @@ string toString(const TokenType &tp) {
         case TokenType::CONTINUE:
             out += "CONTINUE";
             break;
-        case TokenType::INT:
-            out += "INT";
-            break;
-        case TokenType::DOUBLE:
-            out += "DOUBLE";
-            break;
-        case TokenType::BOOL:
-            out += "BOOL";
-            break;
-        case TokenType::STRING:
-            out += "STRING";
+        case TokenType::VOID:
+            out += "VOID";
             break;
         case TokenType::INT_LIT:
             out += "INT_LIT";
@@ -152,7 +143,7 @@ bool isValidIdentifier(string str) {
 
 string toString(const Token &tk) {
     TokenType type = tk.getType();
-    string    out = toString(type);
+    string out = toString(type);
 
     switch (type) {
         default:
@@ -181,7 +172,7 @@ Token::Token(TokenType type) { this->type = type; }
 int parseInt(string str) {
     if (str[0] == '+' || str[0] == '-') throw NumberFormatException("Invalid initial sign.");
     char *check;
-    long  number;
+    long number;
     if (str.substr(0, 2) == "0x") {
         number = strtol(str.substr(2).c_str(), &check, 16);
     }
@@ -203,7 +194,7 @@ int parseInt(string str) {
 
 double parseDouble(string str) {
     if (str[0] == '+' || str[0] == '-') throw NumberFormatException("Invalid initial sign.");
-    char  *check;
+    char *check;
     double number = strtod(str.c_str(), &check);
 
     if (check[0] != '\0') {
@@ -231,7 +222,7 @@ bool isStringLit(string token) {
 }
 
 void Token::formatEscapeSeqs() {
-    auto   size = stringValue.size();
+    auto size = stringValue.size();
     string out;
 
     for (unsigned long i = 0; i < size; i++) {
@@ -268,6 +259,9 @@ void Token::formatEscapeSeqs() {
                 case '\'':
                     out += '\'';
                     break;
+                case 'E':
+                    out += '\33';
+                    break;
                 default:
                     reportError("\\" + std::to_string(stringValue[i + 1]) + " is not a valid escape code");
                     type = TokenType::ERROR;
@@ -282,6 +276,10 @@ void Token::formatEscapeSeqs() {
 }
 
 Token::Token(string token) {
+    if (token.empty() || token[0] <= 32) {
+        type = TokenType::ERROR;
+        return;
+    }
     if (isStringLit(token)) {
         type = TokenType::STRING_LIT;
         stringValue = token.substr(1, token.length() - 2);
@@ -393,17 +391,8 @@ Token::Token(string token) {
     else if (token == "continue") {
         type = TokenType::CONTINUE;
     }
-    else if (token == "int") {
-        type = TokenType::INT;
-    }
-    else if (token == "double") {
-        type = TokenType::DOUBLE;
-    }
-    else if (token == "bool") {
-        type = TokenType::BOOL;
-    }
-    else if (token == "string") {
-        type = TokenType::STRING;
+    else if (token == "void") {
+        type = TokenType::VOID;
     }
     else if (token == "return") {
         type = TokenType::RETURN;
@@ -448,17 +437,17 @@ Token::Token(const Token &other) {
 
 TokenType Token::getType() const { return type; }
 
-int       Token::getInt() const { return intValue; }
+int Token::getInt() const { return intValue; }
 
-double    Token::getDouble() const { return doubleValue; }
+double Token::getDouble() const { return doubleValue; }
 
-bool      Token::getBool() const { return boolValue; }
+bool Token::getBool() const { return boolValue; }
 
-string    Token::getString() const { return stringValue; }
+string Token::getString() const { return stringValue; }
 
-string    Token::getName() const { return identifierName; }
+string Token::getName() const { return identifierName; }
 
-bool      Token::isLiteral() const {
+bool Token::isLiteral() const {
     switch (type) {
         case TokenType::INT_LIT:
         case TokenType::BOOL_LIT:

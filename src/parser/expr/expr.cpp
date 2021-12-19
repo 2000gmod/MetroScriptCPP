@@ -1,16 +1,16 @@
 #include "expr.hpp"
 
+#include <memory>
+
 #include "../../util/util.hpp"
 
-using std::shared_ptr;
-
-shared_ptr<Variable> evaluate(shared_ptr<Expression> expr) {
+VariableSP evaluate(ExprSP expr) {
     Expression *ptr = expr.get();
 
     if (instanceOf<ValueExpr>(ptr)) {
-        ValueExpr           *exprP = (ValueExpr *) ptr;
-        shared_ptr<Token>    value = exprP->value;
-        shared_ptr<Variable> out(new Variable);
+        auto *exprP = (ValueExpr *) ptr;
+        auto value = exprP->value;
+        VariableSP out(new Variable);
 
         switch (exprP->value->getType()) {
             case TokenType::INT_LIT:
@@ -36,16 +36,16 @@ shared_ptr<Variable> evaluate(shared_ptr<Expression> expr) {
     }
 
     else if (instanceOf<UnaryExpr>(ptr)) {
-        UnaryExpr           *exprP = (UnaryExpr *) ptr;
-        shared_ptr<Variable> out;
-        Variable             minusOne(-1);
+        auto *exprP = (UnaryExpr *) ptr;
+        VariableSP out;
+        Variable minusOne(-1);
 
         switch (exprP->op->getType()) {
             case TokenType::PLUS:
                 out = evaluate(exprP->expr);
                 break;
             case TokenType::MINUS:
-                out = shared_ptr<Variable>(new Variable(minusOne * (*evaluate(exprP->expr))));
+                out = std::make_shared<Variable>(Variable(minusOne * (*evaluate(exprP->expr))));
                 break;
             default:
                 throw ExpressionEvaluationException("Invalid unary operator.");
@@ -54,26 +54,26 @@ shared_ptr<Variable> evaluate(shared_ptr<Expression> expr) {
     }
 
     else if (instanceOf<BinaryExpr>(ptr)) {
-        shared_ptr<Variable> out;
-        BinaryExpr          *exprP = (BinaryExpr *) ptr;
+        VariableSP out;
+        auto *exprP = (BinaryExpr *) ptr;
 
-        Variable             leftSide = *(evaluate(exprP->l));
-        Variable             rightSide = *(evaluate(exprP->r));
+        Variable leftSide = *(evaluate(exprP->l));
+        Variable rightSide = *(evaluate(exprP->r));
         switch (exprP->op->getType()) {
             case TokenType::PLUS:
-                out = shared_ptr<Variable>(new Variable(leftSide + rightSide));
+                out = std::make_shared<Variable>(Variable(leftSide + rightSide));
                 break;
             case TokenType::MINUS:
-                out = shared_ptr<Variable>(new Variable(leftSide - rightSide));
+                out = std::make_shared<Variable>(Variable(leftSide - rightSide));
                 break;
             case TokenType::STAR:
-                out = shared_ptr<Variable>(new Variable(leftSide * rightSide));
+                out = std::make_shared<Variable>(Variable(leftSide * rightSide));
                 break;
             case TokenType::SLASH:
-                out = shared_ptr<Variable>(new Variable(leftSide / rightSide));
+                out = std::make_shared<Variable>(Variable(leftSide / rightSide));
                 break;
             case TokenType::MOD:
-                out = shared_ptr<Variable>(new Variable(leftSide % rightSide));
+                out = std::make_shared<Variable>(Variable(leftSide % rightSide));
                 break;
             default:
                 throw ExpressionEvaluationException("Invalid binary operator.");
@@ -83,7 +83,7 @@ shared_ptr<Variable> evaluate(shared_ptr<Expression> expr) {
 
     else if (instanceOf<GroupExpr>(ptr)) {
         GroupExpr *exprP = (GroupExpr *) ptr;
-        return shared_ptr<Variable>(new Variable(*evaluate(exprP->expr)));
+        return std::make_shared<Variable>(Variable(*evaluate(exprP->expr)));
     }
 
     else

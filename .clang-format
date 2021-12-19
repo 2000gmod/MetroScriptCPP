@@ -1,8 +1,7 @@
 ﻿---
 BasedOnStyle: Google
 AccessModifierOffset: 0
-AlignConsecutiveDeclarations: ACS_AcrossEmptyLinesAndComments
-AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
+AlignConsecutiveDeclarations: false
 AlignConsecutiveMacros: AcrossEmptyLinesAndComments
 AlignEscapedNewlines: Left
 AlignOperands: AlignAfterOperator
@@ -32,7 +31,7 @@ TabWidth: 4
 ColumnLimit: 120
 KeepEmptyLinesAtTheStartOfBlocks: true
 
-IndentAccessModifiers: false
+IndentAccessModifiers: true
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Custom
 BraceWrapping:

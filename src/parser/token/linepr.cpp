@@ -5,12 +5,13 @@
 using std::string;
 using std::vector;
 
-string         preProcessString(string line);
-string         removeComments(string line);
+string preProcessString(string line);
+string removeComments(string line);
 vector<string> preTokenize(string line);
+string removeLeadingSpaces(string line);
 
-vector<Token>  tokenizeString(string input) {
-    vector<Token>  out;
+vector<Token> tokenizeString(string input) {
+    vector<Token> out;
     vector<string> preTokens = preTokenize(input);
 
     for (string strToken : preTokens) {
@@ -23,13 +24,13 @@ vector<Token>  tokenizeString(string input) {
 }
 
 vector<string> preTokenize(string line) {
-    string         modifyLine = preProcessString(line);
+    string modifyLine = preProcessString(line);
 
     vector<string> out;
-    string         greatestValidToken, tokenToTry;
+    string greatestValidToken, tokenToTry;
 
     while (!modifyLine.empty()) {
-        if (modifyLine[0] == ' ') modifyLine = modifyLine.substr(1);
+        modifyLine = removeLeadingSpaces(modifyLine);
         greatestValidToken = "";
         tokenToTry = "";
 
@@ -65,24 +66,13 @@ vector<string> preTokenize(string line) {
 
 string preProcessString(string line) {
     line = removeComments(line);
-    string out;
-    bool   writing = false;
-    bool   isInsideString = false;
-
-    for (char c : line) {
-        writing = c != ' ';
-        if (c == '\"') isInsideString = !isInsideString;
-        if (writing || isInsideString) {
-            out += c;
-        }
-    }
-    return out;
+    return line;
 }
 
 string removeComments(string line) {
-    string       out;
-    bool         writing = true;
-    auto         size = line.size();
+    string out;
+    bool writing = true;
+    auto size = line.size();
 
     const string beginComment = "/*";
     const string endComment = "*/";
@@ -106,6 +96,16 @@ string removeComments(string line) {
             }
             if (writing) out += line[i];
         }
+    }
+    return out;
+}
+
+string removeLeadingSpaces(string line) {
+    string out;
+    bool writing = false;
+    for (char c : line) {
+        if (c > 32) writing = true;
+        if (writing) out += c;
     }
     return out;
 }

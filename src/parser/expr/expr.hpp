@@ -8,105 +8,110 @@
 #include "../token/token.hpp"
 #include "../var/var.hpp"
 
-struct ExpressionEvaluationException : public std::exception {
-    std::string message;
-    explicit ExpressionEvaluationException(std::string message) { this->message = message; }
-    const char *what() { return message.c_str(); }
+class ExpressionEvaluationException : public std::exception {
+    private:
+        std::string message;
+
+    public:
+        explicit ExpressionEvaluationException(std::string message) { this->message = message; }
+        const char *what() { return message.c_str(); }
 };
 
 class Expression {
     public:
-    virtual ~Expression() = default;
+        virtual ~Expression() = default;
 };
+
+typedef std::shared_ptr<Expression> ExprSP;
+typedef std::shared_ptr<Token> TokenSP;
+typedef std::shared_ptr<Variable> VariableSP;
 
 class ValueExpr : public Expression {
-    friend std::shared_ptr<Variable> evaluate(std::shared_ptr<Expression> expr);
-
     public:
-    ValueExpr(std::shared_ptr<Token> var) { value = var; };
-
-    private:
-    std::shared_ptr<Token> value;
+        ValueExpr(TokenSP var) { value = var; };
+        TokenSP value;
 };
+
+typedef std::shared_ptr<ValueExpr> ValueExprSP;
 
 class IdentExpr : public Expression {
-    friend std::shared_ptr<Variable> evaluate(std::shared_ptr<Expression> expr);
-
     public:
-    IdentExpr(std::shared_ptr<Token> id) { name = id; }
-
-    private:
-    std::shared_ptr<Token> name;
+        IdentExpr(TokenSP id) { name = id; }
+        TokenSP name;
 };
+
+typedef std::shared_ptr<IdentExpr> IdentExprSP;
 
 class UnaryExpr : public Expression {
-    friend std::shared_ptr<Variable> evaluate(std::shared_ptr<Expression> expr);
-
     public:
-    UnaryExpr(std::shared_ptr<Expression> expr, std::shared_ptr<Token> op) {
-        this->expr = expr;
-        this->op = op;
-    }
-
-    private:
-    std::shared_ptr<Expression> expr;
-    std::shared_ptr<Token>      op;
+        UnaryExpr(ExprSP expr, TokenSP op) {
+            this->expr = expr;
+            this->op = op;
+        }
+        ExprSP expr;
+        TokenSP op;
 };
+
+typedef std::shared_ptr<UnaryExpr> UnaryExprSP;
 
 class AsignExpr : public Expression {
-    friend std::shared_ptr<Variable> evaluate(std::shared_ptr<Expression> expr);
-
     public:
-    AsignExpr(std::shared_ptr<Token> name, std::shared_ptr<Expression> expr) {
-        this->name = name;
-        this->expr = expr;
-    }
-
-    private:
-    std::shared_ptr<Token>      name;
-    std::shared_ptr<Expression> expr;
+        AsignExpr(TokenSP name, ExprSP expr) {
+            this->name = name;
+            this->expr = expr;
+        }
+        TokenSP name;
+        ExprSP expr;
 };
+
+typedef std::shared_ptr<AsignExpr> AsignExprSP;
 
 class BinaryExpr : public Expression {
-    friend std::shared_ptr<Variable> evaluate(std::shared_ptr<Expression> expr);
-
     public:
-    BinaryExpr(std::shared_ptr<Expression> left, std::shared_ptr<Expression> right, std::shared_ptr<Token> op) {
-        l = left;
-        r = right;
-        this->op = op;
-    };
-
-    private:
-    std::shared_ptr<Expression> l;
-    std::shared_ptr<Expression> r;
-    std::shared_ptr<Token>      op;
+        BinaryExpr(ExprSP l, ExprSP r, TokenSP op) {
+            this->l = l;
+            this->r = r;
+            this->op = op;
+        };
+        ExprSP l;
+        ExprSP r;
+        TokenSP op;
 };
+
+typedef std::shared_ptr<BinaryExpr> BinaryExprSP;
 
 class GroupExpr : public Expression {
-    friend std::shared_ptr<Variable> evaluate(std::shared_ptr<Expression> expr);
-
     public:
-    GroupExpr(std::shared_ptr<Expression> expr) { this->expr = expr; };
-
-    private:
-    std::shared_ptr<Expression> expr;
+        GroupExpr(ExprSP expr) { this->expr = expr; };
+        ExprSP expr;
 };
+
+typedef std::shared_ptr<GroupExpr> GroupExprSP;
 
 class CallExpr : public Expression {
-    friend std::shared_ptr<Variable> evaluate(std::shared_ptr<Expression> expr);
-
     public:
-    CallExpr(std::vector<std::shared_ptr<Expression>> args, std::shared_ptr<Token> name) {
-        this->args = args;
-        this->name = name;
-    }
-
-    private:
-    std::vector<std::shared_ptr<Expression>> args;
-    std::shared_ptr<Token>                   name;
+        CallExpr(std::vector<ExprSP> args, ExprSP callee) {
+            this->args = args;
+            this->callee = callee;
+        }
+        std::vector<ExprSP> args;
+        ExprSP callee;
 };
 
-std::shared_ptr<Variable> evaluate(std::shared_ptr<Expression> expr);
+typedef std::shared_ptr<CallExpr> CallExprSP;
+
+class CastingExpr : public Expression {
+    public:
+        CastingExpr(TokenSP type, ExprSP expr) {
+            this->type = type;
+            this->expr = expr;
+        }
+        TokenSP type;
+        ExprSP expr;
+};
+
+typedef std::shared_ptr<CastingExpr> CastingExprSP;
+
+VariableSP evaluate(ExprSP expr);
 
 #endif
