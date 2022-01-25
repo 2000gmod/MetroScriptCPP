@@ -1,5 +1,8 @@
 #include "token.hpp"
 
+#include <exception>
+#include <string>
+
 #include "../../util/util.hpp"
 
 using std::string;
@@ -116,6 +119,9 @@ string toString(const TokenType &tp) {
         case TokenType::IDENTIFIER:
             out += "IDENTIFIER";
             break;
+        case TokenType::TYPE:
+            out += "TYPE";
+            break;
         case TokenType::RETURN:
             out += "RETURN";
             break;
@@ -163,6 +169,9 @@ string toString(const Token &tk) {
         case TokenType::IDENTIFIER:
             out += ": " + tk.getName();
             break;
+        case TokenType::TYPE:
+            out += ": " + tk.getTypeName();
+            break;
     }
     return out;
 }
@@ -178,6 +187,9 @@ int parseInt(string str) {
     }
     else if (str.substr(0, 2) == "0b") {
         number = strtol(str.substr(2).c_str(), &check, 2);
+    }
+    else if (str.substr(0, 2) == "0o") {
+        number = strtol(str.substr(2).c_str(), &check, 8);
     }
 
     else
@@ -259,9 +271,17 @@ void Token::formatEscapeSeqs() {
                 case '\'':
                     out += '\'';
                     break;
-                case 'E':
-                    out += '\33';
+                case 'x': {
+                    if (i + 3 > size - 1) throw NumberFormatException("No space for number.");
+                    string numStr = "0x";
+                    numStr += stringValue[i + 2];
+                    numStr += stringValue[i + 3];
+
+                    auto code = parseInt(numStr);
+                    out += (unsigned char) code;
+                    i += 2;
                     break;
+                }
                 default:
                     reportError("\\" + std::to_string(stringValue[i + 1]) + " is not a valid escape code");
                     type = TokenType::ERROR;
@@ -283,7 +303,11 @@ Token::Token(string token) {
     if (isStringLit(token)) {
         type = TokenType::STRING_LIT;
         stringValue = token.substr(1, token.length() - 2);
-        formatEscapeSeqs();
+        try {
+            formatEscapeSeqs();
+        } catch (NumberFormatException &e) {
+            type = TokenType::ERROR;
+        }
         return;
     }
 
@@ -401,6 +425,10 @@ Token::Token(string token) {
         type = TokenType::BOOL_LIT;
         boolValue = (token == "true") ? true : false;
     }
+    else if (isBasicType(token)) {
+        type = TokenType::TYPE;
+        typeString = token;
+    }
     else {
         if (isValidIdentifier(token)) {
             type = TokenType::IDENTIFIER;
@@ -430,6 +458,9 @@ Token::Token(const Token &other) {
         case TokenType::IDENTIFIER:
             identifierName = other.identifierName;
             return;
+        case TokenType::TYPE:
+            typeString = other.typeString;
+            return;
         default:
             return;
     }
@@ -446,6 +477,8 @@ bool Token::getBool() const { return boolValue; }
 string Token::getString() const { return stringValue; }
 
 string Token::getName() const { return identifierName; }
+
+string Token::getTypeName() const { return typeString; }
 
 bool Token::isLiteral() const {
     switch (type) {
@@ -473,3 +506,15 @@ bool Token::isOperator() const {
 }
 
 void Token::nullify() { type = TokenType::EOFILE; }
+
+bool Token::isBasicType(string subToken) {
+    if (subToken == "int" || subToken == "double" || subToken == "string" || subToken == "bool")
+        return true;
+    else
+        return false;
+}
+
+bool Token::isType(std::string subToken) {
+    // TODO
+    return isBasicType(subToken);
+}

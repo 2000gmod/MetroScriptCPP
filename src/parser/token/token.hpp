@@ -48,6 +48,7 @@ enum class TokenType {
     BOOL_LIT,
     STRING_LIT,
     IDENTIFIER,
+    TYPE,
 
     RETURN,
     ERROR,
@@ -65,8 +66,10 @@ class Token {
         std::string stringValue;
 
         std::string identifierName;
+        std::string typeString;
 
         void formatEscapeSeqs();
+        bool isBasicType(std::string subToken);
 
     public:
         Token(TokenType type);
@@ -79,9 +82,11 @@ class Token {
         bool getBool() const;
         std::string getString() const;
         std::string getName() const;
+        std::string getTypeName() const;
 
         bool isLiteral() const;
         bool isOperator() const;
+        bool isType(std::string subToken);
 
         void nullify();
 };

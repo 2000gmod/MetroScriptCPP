@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #include "info.hpp"
 #include "parser/expr/expr.hpp"

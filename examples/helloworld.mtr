@@ -1,4 +1,7 @@
-int main(int a) {
+/* This is a comment
+It should not be parsed */
+
+void main() {
     print("Hello World\n");
-    return 0;
+    return;
 }

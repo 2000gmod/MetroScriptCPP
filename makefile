@@ -1,7 +1,7 @@
 MAKEFLAGS += --no-print-directory
 
 TARGET = $(OUTDIR)/mscppi
-MAINARGS = -m
+MAINARGS = -t
 
 CC = g++
 CFLAGS = -Wall -Wextra -Wpedantic -MMD

@@ -112,6 +112,18 @@ class CastingExpr : public Expression {
 
 typedef std::shared_ptr<CastingExpr> CastingExprSP;
 
+class SubscriptExpr : public Expression {
+    public:
+        SubscriptExpr(ExprSP accessed, ExprSP index) {
+            this->accessed = accessed;
+            this->index = index;
+        }
+        ExprSP accessed;
+        ExprSP index;
+};
+
+typedef std::shared_ptr<SubscriptExpr> SubscriptExprSP;
+
 VariableSP evaluate(ExprSP expr);
 
 #endif
