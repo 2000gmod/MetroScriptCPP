@@ -51,10 +51,10 @@ class Parser {
         ExprSP callExpr();
         ExprSP finishCallExpr(ExprSP callee);
         ExprSP primaryExpr();
-        
+
         bool match(std::vector<TokenType> types);
         bool match(TokenType type);
-        const Token& consume(TokenType type, const char *message);
+        const Token &consume(TokenType type, const char *message);
         bool check(TokenType type);
         const Token &advance();
         bool isAtEnd();

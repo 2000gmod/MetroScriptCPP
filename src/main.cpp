@@ -61,8 +61,7 @@ void runFile(std::string filename) {
     try {
         Parser parser(tokens);
         std::vector<StmtSP> statements = parser.parse();
-    }
-    catch (ParseException&) {
+    } catch (ParseException &) {
         exit(1);
     }
 }

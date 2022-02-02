@@ -37,7 +37,7 @@ StmtSP Parser::declaration() {
         }
     }
     return statement();
-    //throw error(peek(), "Only declarations are allowed outside of a function scope.");
+    // throw error(peek(), "Only declarations are allowed outside of a function scope.");
 }
 
 VarDeclStmtSP Parser::varDeclaration(Token type, Token name) {
@@ -65,7 +65,8 @@ FunctionDeclStmtSP Parser::functionDecl(Token type, Token name) {
     consume(TokenType::LEFT_CUR, "Expected '{' after function declaration.");
     StmtSP funBlock = blockStatement();
 
-    return std::make_shared<FunctionDeclStmt>(std::make_shared<Token>(type), std::make_shared<Token>(name), params, funBlock);
+    return std::make_shared<FunctionDeclStmt>(std::make_shared<Token>(type), std::make_shared<Token>(name), params,
+                                              funBlock);
 }
 
 StmtSP Parser::statement() {
@@ -92,8 +93,10 @@ StmtSP Parser::forStatement() {
         init = nullptr;
     }
     else if (match(TokenType::TYPE)) {
-        init = varDeclaration(previous(),
-                              consume(TokenType::IDENTIFIER, "Expected identifier after variable declaration"));
+        const Token &type = previous();
+        const Token &id = consume(TokenType::IDENTIFIER, "Expected identifier after variable declaration");
+        consume(TokenType::ASSIGN, "Variable declaration without assignment is illegal in a for loop.");
+        init = varDeclaration(type, id);
     }
     else {
         init = expressionStatement();
@@ -168,9 +171,7 @@ StmtSP Parser::whileStatement() {
     return std::make_shared<WhileStmt>(condition, body);
 }
 
-ExprSP Parser::expression() {
-    return assignment();
-}
+ExprSP Parser::expression() { return assignment(); }
 
 ExprSP Parser::assignment() {
     ExprSP expr = orExpr();
@@ -180,7 +181,7 @@ ExprSP Parser::assignment() {
         ExprSP value = assignment();
 
         if (instanceOf<IdentExpr>(expr.get())) {
-            TokenSP name = ((IdentExpr*) expr.get())->name;
+            TokenSP name = ((IdentExpr *) expr.get())->name;
             return std::make_shared<AsignExpr>(name, value);
         }
         error(*equals.get(), "Invalid assignment target.");
@@ -271,11 +272,12 @@ ExprSP Parser::unary() {
 ExprSP Parser::callExpr() {
     ExprSP expr = primaryExpr();
 
-    while(true) {
+    while (true) {
         if (match(TokenType::LEFT_PAREN)) {
             expr = finishCallExpr(expr);
         }
-        else break;
+        else
+            break;
     }
     return expr;
 }
@@ -288,7 +290,7 @@ ExprSP Parser::finishCallExpr(ExprSP callee) {
                 error(peek(), "Cannot have more than 8 arguments.");
             }
             args.push_back(expression());
-        } while(match(TokenType::COMMA));
+        } while (match(TokenType::COMMA));
     }
     consume(TokenType::RIGHT_PAREN, "Expected ')' after argument list of call expression.");
     return std::make_shared<CallExpr>(args, callee);
