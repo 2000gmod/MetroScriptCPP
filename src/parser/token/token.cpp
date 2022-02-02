@@ -101,9 +101,6 @@ string toString(const TokenType &tp) {
         case TokenType::CONTINUE:
             out += "CONTINUE";
             break;
-        case TokenType::VOID:
-            out += "VOID";
-            break;
         case TokenType::INT_LIT:
             out += "INT_LIT";
             break;
@@ -415,9 +412,6 @@ Token::Token(string token) {
     else if (token == "continue") {
         type = TokenType::CONTINUE;
     }
-    else if (token == "void") {
-        type = TokenType::VOID;
-    }
     else if (token == "return") {
         type = TokenType::RETURN;
     }
@@ -508,7 +502,7 @@ bool Token::isOperator() const {
 void Token::nullify() { type = TokenType::EOFILE; }
 
 bool Token::isBasicType(string subToken) {
-    if (subToken == "int" || subToken == "double" || subToken == "string" || subToken == "bool")
+    if (subToken == "int" || subToken == "double" || subToken == "string" || subToken == "bool" || subToken == "void")
         return true;
     else
         return false;

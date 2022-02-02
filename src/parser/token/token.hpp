@@ -41,8 +41,6 @@ enum class TokenType {
     BREAK,
     CONTINUE,
 
-    VOID,
-
     INT_LIT,
     DOUBLE_LIT,
     BOOL_LIT,

@@ -1,7 +1,7 @@
 MAKEFLAGS += --no-print-directory
 
 TARGET = $(OUTDIR)/mscppi
-MAINARGS = -t
+MAINARGS = examples/helloworld.mtr
 
 CC = g++
 CFLAGS = -Wall -Wextra -Wpedantic -MMD
@@ -13,6 +13,7 @@ SRCDIR = src
 OUTDIR = out
 
 SOURCES := $(shell find . -name '*.cpp')
+HEADERS := $(shell find . -name '*.hpp')
 OBJECTS := $(subst .cpp,.o, $(subst ./src,./$(OBJDIR),$(SOURCES)))
 DEPS := $(shell find . -name '*.d')
 

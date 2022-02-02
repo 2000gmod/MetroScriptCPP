@@ -58,8 +58,13 @@ void runFile(std::string filename) {
     file.close();
 
     std::vector<Token> tokens = tokenizeString(buffer.str());
-    // Parser parser(tokens);
-    // std::vector<StmtSP> statements = parser.parse();
+    try {
+        Parser parser(tokens);
+        std::vector<StmtSP> statements = parser.parse();
+    }
+    catch (ParseException&) {
+        exit(1);
+    }
 
     for (Token &tok : tokens) {
         std::cout << toString(tok) << "\n";
