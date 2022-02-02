@@ -65,10 +65,6 @@ void runFile(std::string filename) {
     catch (ParseException&) {
         exit(1);
     }
-
-    for (Token &tok : tokens) {
-        std::cout << toString(tok) << "\n";
-    }
 }
 
 int main(int argc, char **argv) {

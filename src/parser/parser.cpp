@@ -36,7 +36,8 @@ StmtSP Parser::declaration() {
             }
         }
     }
-    throw error(peek(), "Only declarations are allowed outside of a function scope.");
+    return statement();
+    //throw error(peek(), "Only declarations are allowed outside of a function scope.");
 }
 
 VarDeclStmtSP Parser::varDeclaration(Token type, Token name) {
@@ -289,7 +290,7 @@ ExprSP Parser::finishCallExpr(ExprSP callee) {
             args.push_back(expression());
         } while(match(TokenType::COMMA));
     }
-
+    consume(TokenType::RIGHT_PAREN, "Expected ')' after argument list of call expression.");
     return std::make_shared<CallExpr>(args, callee);
 }
 
