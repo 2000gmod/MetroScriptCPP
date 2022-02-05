@@ -19,35 +19,31 @@ std::vector<StmtSP> Parser::parse() {
 }
 
 StmtSP Parser::declaration() {
-    if (match(TokenType::TYPE)) {
-        const Token &typeToken = previous();
-        if (match(TokenType::IDENTIFIER)) {
-            const Token &name = previous();
-
-            if (match(TokenType::ASSIGN)) {
-                return varDeclaration(typeToken, name);
-            }
-            else if (match(TokenType::SEMICOLON)) {
-                return std::make_shared<VarDeclStmt>(std::make_shared<Token>(typeToken), std::make_shared<Token>(name));
-            }
-
-            else if (match(TokenType::LEFT_PAREN)) {
-                return functionDecl(typeToken, name);
-            }
+    TypeSP typeExpr = type();
+    if (typeExpr != nullptr) {
+        const Token &name = consume(TokenType::IDENTIFIER, "Expected identifier.");
+        if (match(TokenType::SEMICOLON)) {
+            return std::make_shared<VarDeclStmt>(typeExpr, std::make_shared<Token>(name));
         }
+        if (match(TokenType::ASSIGN)) {
+            return varDeclaration(typeExpr, name);
+        }
+        if (match(TokenType::LEFT_PAREN)) {
+            return functionDecl(typeExpr, name);
+        }
+        throw error(peek(), "Declaration expression is not valid");
     }
-    return statement();
-    // throw error(peek(), "Only declarations are allowed outside of a function scope.");
+    else return statement();
 }
 
-VarDeclStmtSP Parser::varDeclaration(Token type, Token name) {
+VarDeclStmtSP Parser::varDeclaration(TypeSP type, const Token &name) {
     ExprSP initValue = expression();
     consume(TokenType::SEMICOLON, "Expected ';' after variable declaration.");
 
-    return std::make_shared<VarDeclStmt>(std::make_shared<Token>(type), std::make_shared<Token>(name), initValue);
+    return std::make_shared<VarDeclStmt>(type, std::make_shared<Token>(name), initValue);
 }
 
-FunctionDeclStmtSP Parser::functionDecl(Token type, Token name) {
+FunctionDeclStmtSP Parser::functionDecl(TypeSP type, const Token &name) {
     std::vector<parameterT> params;
 
     if (!check(TokenType::RIGHT_PAREN)) {
@@ -55,7 +51,7 @@ FunctionDeclStmtSP Parser::functionDecl(Token type, Token name) {
             if (params.size() >= 8) {
                 error(peek(), "Cannot have more than 8 parameters.");
             }
-            parameterT param = {std::make_shared<Token>(consume(TokenType::TYPE, "Expected a type.")),
+            parameterT param = {this->type(),
                                 std::make_shared<Token>(consume(TokenType::IDENTIFIER, "Expected an identifier."))};
             params.push_back(param);
 
@@ -65,7 +61,7 @@ FunctionDeclStmtSP Parser::functionDecl(Token type, Token name) {
     consume(TokenType::LEFT_CUR, "Expected '{' after function declaration.");
     StmtSP funBlock = blockStatement();
 
-    return std::make_shared<FunctionDeclStmt>(std::make_shared<Token>(type), std::make_shared<Token>(name), params,
+    return std::make_shared<FunctionDeclStmt>(type, std::make_shared<Token>(name), params,
                                               funBlock);
 }
 
@@ -75,6 +71,8 @@ StmtSP Parser::statement() {
     if (match(TokenType::RETURN)) return returnStatement();
     if (match(TokenType::WHILE)) return whileStatement();
     if (match(TokenType::LEFT_CUR)) return blockStatement();
+    if (match(TokenType::BREAK)) return breakStatement();
+    if (match(TokenType::CONTINUE)) return continueStatement();
 
     return expressionStatement();
 }
@@ -92,11 +90,11 @@ StmtSP Parser::forStatement() {
     if (match(TokenType::SEMICOLON)) {
         init = nullptr;
     }
-    else if (match(TokenType::TYPE)) {
-        const Token &type = previous();
+    else if (check(TokenType::TYPE)) {
+        TypeSP typeExpr = type();
         const Token &id = consume(TokenType::IDENTIFIER, "Expected identifier after variable declaration");
         consume(TokenType::ASSIGN, "Variable declaration without assignment is illegal in a for loop.");
-        init = varDeclaration(type, id);
+        init = varDeclaration(typeExpr, id);
     }
     else {
         init = expressionStatement();
@@ -122,7 +120,7 @@ StmtSP Parser::forStatement() {
     }
     if (condition == nullptr) condition = std::make_shared<ValueExpr>(std::make_shared<Token>(Token("true")));
 
-    body = std::make_shared<WhileStmt>(condition, body);
+    body = std::make_shared<WhileStmt>(condition, body, true);
 
     if (init != nullptr) {
         body = std::make_shared<BlockStmt>(std::vector<StmtSP> {init, body});
@@ -169,6 +167,16 @@ StmtSP Parser::whileStatement() {
     StmtSP body = statement();
 
     return std::make_shared<WhileStmt>(condition, body);
+}
+
+StmtSP Parser::breakStatement() {
+    consume(TokenType::SEMICOLON, "Expected ';' after break statement.");
+    return std::make_shared<BreakStmt>();
+}
+
+StmtSP Parser::continueStatement() {
+    consume(TokenType::SEMICOLON, "Expected ';' after continue statement.");
+    return std::make_shared<ContinueStmt>();
 }
 
 ExprSP Parser::expression() { return assignment(); }
@@ -313,6 +321,39 @@ ExprSP Parser::primaryExpr() {
     throw error(peek(), "Expected expression.");
 }
 
+TypeSP Parser::type() {
+    return functionPointerType();
+}
+
+TypeSP Parser::functionPointerType() {
+    TypeSP typeExpr = arrayType();
+    
+    while(match(TokenType::LEFT_PAREN) && typeExpr != nullptr) {
+        consume(TokenType::RIGHT_PAREN, "Expected ')' after function pointer type expression.");
+        typeExpr = std::make_shared<FuncPtrType>(typeExpr);
+    }
+    return typeExpr;
+}
+
+TypeSP Parser::arrayType() {
+    TypeSP typeExpr = basicType();
+    
+    while(match(TokenType::LEFT_SQR) && typeExpr != nullptr) {
+        consume(TokenType::RIGHT_SQR, "Expected ']' after array type expression.");
+        typeExpr = std::make_shared<ArrayType>(typeExpr);
+    }
+    return typeExpr;
+}
+
+TypeSP Parser::basicType() {
+    if (match({TokenType::TYPE, TokenType::IDENTIFIER})) {
+        return std::make_shared<BasicType>(std::make_shared<Token>(previous()));
+    }
+    else {
+        return nullptr;
+    }
+}
+
 bool Parser::match(std::vector<TokenType> types) {
     for (TokenType &type : types) {
         if (check(type)) {
@@ -353,7 +394,7 @@ const Token &Parser::peek() { return tokens[current]; }
 const Token &Parser::previous() { return tokens[current - 1]; }
 
 ParseException Parser::error(const Token &token, const char *message) {
-    std::string messageString = "(at token \"" + toString(token) + "\") " + message;
+    std::string messageString = "(at token \"" + toString(token) + "\"): " + message;
     reportError(messageString);
     return ParseException(messageString);
 }

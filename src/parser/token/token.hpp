@@ -4,6 +4,7 @@
 #include <exception>
 #include <ostream>
 #include <string>
+#include <memory>
 
 enum class TokenType {
     PLUS,
@@ -67,7 +68,6 @@ class Token {
         std::string typeString;
 
         void formatEscapeSeqs();
-        bool isBasicType(std::string subToken);
 
     public:
         Token(TokenType type);
@@ -84,10 +84,11 @@ class Token {
 
         bool isLiteral() const;
         bool isOperator() const;
-        bool isType(std::string subToken);
+        bool isBasicType(std::string subToken);
 
         void nullify();
 };
+typedef std::shared_ptr<Token> TokenSP;
 
 std::string toString(const Token &tk);
 

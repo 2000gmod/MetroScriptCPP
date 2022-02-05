@@ -1,0 +1,20 @@
+
+
+int testFunction(int a, double b, string c, bool d) {
+    int x = 3 + 3 * 8 / anotherFunction(a, 3);
+
+
+    for (int i = 9; i < 10; i = i + 1) {
+        anotherFunction(a, 1,5);
+    }
+
+    while (true) {
+        doSomething();
+        break;
+    }
+
+    if (x < 5) {
+        return 3;
+    }
+    else return 0;
+}

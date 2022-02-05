@@ -1,12 +1,10 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
-#include <memory>
-#include <vector>
-
 #include "expr/expr.hpp"
 #include "stmt/stmt.hpp"
 #include "token/token.hpp"
+#include "type/type.hpp"
 
 class ParseException : public std::exception {
     private:
@@ -27,8 +25,8 @@ class Parser {
         int current = 0;
 
         StmtSP declaration();
-        VarDeclStmtSP varDeclaration(Token type, Token name);
-        FunctionDeclStmtSP functionDecl(Token type, Token name);
+        VarDeclStmtSP varDeclaration(TypeSP type, const Token &name);
+        FunctionDeclStmtSP functionDecl(TypeSP type, const Token &name);
 
         StmtSP statement();
 
@@ -38,6 +36,8 @@ class Parser {
         StmtSP returnStatement();
         StmtSP blockStatement();
         StmtSP whileStatement();
+        StmtSP breakStatement();
+        StmtSP continueStatement();
 
         ExprSP expression();
         ExprSP assignment();
@@ -51,6 +51,11 @@ class Parser {
         ExprSP callExpr();
         ExprSP finishCallExpr(ExprSP callee);
         ExprSP primaryExpr();
+
+        TypeSP type();
+        TypeSP functionPointerType();
+        TypeSP arrayType();
+        TypeSP basicType();
 
         bool match(std::vector<TokenType> types);
         bool match(TokenType type);

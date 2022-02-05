@@ -7,6 +7,7 @@
 
 #include "../token/token.hpp"
 #include "../var/var.hpp"
+#include "../type/type.hpp"
 
 class ExpressionEvaluationException : public std::exception {
     private:
@@ -23,7 +24,6 @@ class Expression {
 };
 
 typedef std::shared_ptr<Expression> ExprSP;
-typedef std::shared_ptr<Token> TokenSP;
 typedef std::shared_ptr<Variable> VariableSP;
 
 class ValueExpr : public Expression {
@@ -102,11 +102,11 @@ typedef std::shared_ptr<CallExpr> CallExprSP;
 
 class CastingExpr : public Expression {
     public:
-        CastingExpr(TokenSP type, ExprSP expr) {
+        CastingExpr(TypeSP type, ExprSP expr) {
             this->type = type;
             this->expr = expr;
         }
-        TokenSP type;
+        TypeSP type;
         ExprSP expr;
 };
 

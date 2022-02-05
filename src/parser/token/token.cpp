@@ -507,8 +507,3 @@ bool Token::isBasicType(string subToken) {
     else
         return false;
 }
-
-bool Token::isType(std::string subToken) {
-    // TODO
-    return isBasicType(subToken);
-}
