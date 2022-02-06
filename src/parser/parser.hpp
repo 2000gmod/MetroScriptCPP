@@ -23,7 +23,8 @@ class Parser {
     private:
         std::vector<Token> tokens;
         int current = 0;
-
+        
+        bool isDeclaration();
         StmtSP declaration();
         VarDeclStmtSP varDeclaration(TypeSP type, const Token &name);
         FunctionDeclStmtSP functionDecl(TypeSP type, const Token &name);

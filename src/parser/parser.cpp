@@ -18,9 +18,23 @@ std::vector<StmtSP> Parser::parse() {
     return out;
 }
 
-StmtSP Parser::declaration() {
+bool Parser::isDeclaration() {
+    int currentBeforeCheck = current;
     TypeSP typeExpr = type();
-    if (typeExpr != nullptr) {
+
+    if(typeExpr != nullptr && match(TokenType::IDENTIFIER)) {
+        current = currentBeforeCheck;
+        return true;
+    }
+    else {
+        current = currentBeforeCheck;
+        return false;
+    }
+}
+
+StmtSP Parser::declaration() {
+    if (isDeclaration()) {
+        TypeSP typeExpr = type();
         const Token &name = consume(TokenType::IDENTIFIER, "Expected identifier.");
         if (match(TokenType::SEMICOLON)) {
             return std::make_shared<VarDeclStmt>(typeExpr, std::make_shared<Token>(name));
@@ -322,10 +336,11 @@ ExprSP Parser::primaryExpr() {
 }
 
 TypeSP Parser::type() {
-    return functionPointerType();
+    return arrayType();
 }
 
 TypeSP Parser::functionPointerType() {
+    //TODO
     TypeSP typeExpr = arrayType();
     
     while(match(TokenType::LEFT_PAREN) && typeExpr != nullptr) {
