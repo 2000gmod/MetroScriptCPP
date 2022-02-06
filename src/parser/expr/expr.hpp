@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "../token/token.hpp"
-#include "../var/var.hpp"
 #include "../type/type.hpp"
+#include "../var/var.hpp"
 
 class ExpressionEvaluationException : public std::exception {
     private:

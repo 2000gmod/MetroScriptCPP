@@ -293,6 +293,7 @@ void Token::formatEscapeSeqs() {
 }
 
 Token::Token(string token) {
+    line = 0;
     if (token.empty() || token[0] <= 32) {
         type = TokenType::ERROR;
         return;
@@ -434,8 +435,11 @@ Token::Token(string token) {
     }
 }
 
+Token::Token(std::string token, int line) : Token(token) { this->line = line; }
+
 Token::Token(const Token &other) {
     type = other.getType();
+    line = other.getLine();
     switch (type) {
         case TokenType::INT_LIT:
             intValue = other.intValue;
@@ -507,3 +511,5 @@ bool Token::isBasicType(string subToken) {
     else
         return false;
 }
+
+int Token::getLine() const { return line; }

@@ -2,9 +2,9 @@
 #define TOKEN_H
 
 #include <exception>
+#include <memory>
 #include <ostream>
 #include <string>
-#include <memory>
 
 enum class TokenType {
     PLUS,
@@ -67,11 +67,14 @@ class Token {
         std::string identifierName;
         std::string typeString;
 
+        int line;
+
         void formatEscapeSeqs();
 
     public:
         Token(TokenType type);
         Token(std::string token);
+        Token(std::string token, int line);
         Token(const Token &other);
 
         TokenType getType() const;
@@ -85,6 +88,8 @@ class Token {
         bool isLiteral() const;
         bool isOperator() const;
         bool isBasicType(std::string subToken);
+
+        int getLine() const;
 
         void nullify();
 };

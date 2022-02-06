@@ -100,14 +100,14 @@ typedef std::shared_ptr<WhileStmt> WhileStmtSP;
 
 class BreakStmt : public Statement {
     public:
-        //BreakStmt();
+        // BreakStmt();
 };
 
 typedef std::shared_ptr<BreakStmt> BreakStmtSP;
 
 class ContinueStmt : public Statement {
     public:
-        //ContinueStmt();
+        // ContinueStmt();
 };
 
 typedef std::shared_ptr<ContinueStmt> ContinueStmtSP;

@@ -7,29 +7,50 @@ using std::vector;
 
 string preProcessString(string line);
 string removeComments(string line);
-vector<string> preTokenize(string line);
+vector<Token> tokenize(string line);
 string removeLeadingSpaces(string line);
 
-vector<Token> tokenizeString(string input) {
-    vector<Token> out;
-    vector<string> preTokens = preTokenize(input);
+vector<string> getFileLines(string fileContent) {
+    string modLine = preProcessString(fileContent);
+    string nline = "\n";
+    size_t pos = 0;
+    string line;
+    vector<string> out;
 
-    for (string strToken : preTokens) {
-        out.push_back(Token(strToken));
+    while ((pos = modLine.find(nline)) != std::string::npos) {
+        line = modLine.substr(0, pos);
+        out.push_back(line);
+        modLine.erase(0, pos + nline.length());
     }
+    out.push_back(modLine);
+    return out;
+}
 
+vector<Token> tokenizeString(string input) {
+    vector<Token> out = tokenize(input);
     out.push_back(Token(TokenType::EOFILE));
 
     return out;
 }
 
-vector<string> preTokenize(string line) {
+int countLeadingNewLines(const string &line) {
+    int out = 0;
+    for (const char c : line) {
+        if (c == '\n') out++;
+        else break;
+    }
+    return out;
+}
+
+vector<Token> tokenize(string line) {
     string modifyLine = preProcessString(line);
 
-    vector<string> out;
+    vector<Token> out;
     string greatestValidToken, tokenToTry;
+    int lineNum = 0;
 
     while (!modifyLine.empty()) {
+        lineNum += countLeadingNewLines(modifyLine);
         modifyLine = removeLeadingSpaces(modifyLine);
         greatestValidToken = "";
         tokenToTry = "";
@@ -40,8 +61,8 @@ vector<string> preTokenize(string line) {
             else
                 continue;
 
-            Token test1(tokenToTry);
-            if (test1.getType() != TokenType::ERROR) {
+            Token tokenTest(tokenToTry);
+            if (tokenTest.getType() != TokenType::ERROR) {
                 greatestValidToken = tokenToTry;
 
                 if (greatestValidToken[0] != '\"' && greatestValidToken[greatestValidToken.length() - 1] != '\"') {
@@ -53,11 +74,11 @@ vector<string> preTokenize(string line) {
         }
 
         if (!greatestValidToken.empty()) {
-            out.push_back(greatestValidToken);
+            out.push_back(Token(greatestValidToken, lineNum));
             modifyLine = modifyLine.substr(greatestValidToken.length());
         }
         else {
-            out.push_back("?");
+            out.push_back(Token("?", lineNum));
             break;
         }
     }

@@ -8,7 +8,10 @@
 #include "stmt/stmt.hpp"
 #include "token/token.hpp"
 
-Parser::Parser(std::vector<Token> tokens) { this->tokens = tokens; }
+Parser::Parser(std::vector<Token> tokens, std::vector<std::string> fileLines) {
+    this->tokens = tokens;
+    this->fileLines = fileLines;
+}
 
 std::vector<StmtSP> Parser::parse() {
     std::vector<StmtSP> out;
@@ -22,7 +25,7 @@ bool Parser::isDeclaration() {
     int currentBeforeCheck = current;
     TypeSP typeExpr = type();
 
-    if(typeExpr != nullptr && match(TokenType::IDENTIFIER)) {
+    if (typeExpr != nullptr && match(TokenType::IDENTIFIER)) {
         current = currentBeforeCheck;
         return true;
     }
@@ -47,7 +50,8 @@ StmtSP Parser::declaration() {
         }
         throw error(peek(), "Declaration expression is not valid");
     }
-    else return statement();
+    else
+        return statement();
 }
 
 VarDeclStmtSP Parser::varDeclaration(TypeSP type, const Token &name) {
@@ -75,8 +79,7 @@ FunctionDeclStmtSP Parser::functionDecl(TypeSP type, const Token &name) {
     consume(TokenType::LEFT_CUR, "Expected '{' after function declaration.");
     StmtSP funBlock = blockStatement();
 
-    return std::make_shared<FunctionDeclStmt>(type, std::make_shared<Token>(name), params,
-                                              funBlock);
+    return std::make_shared<FunctionDeclStmt>(type, std::make_shared<Token>(name), params, funBlock);
 }
 
 StmtSP Parser::statement() {
@@ -335,15 +338,13 @@ ExprSP Parser::primaryExpr() {
     throw error(peek(), "Expected expression.");
 }
 
-TypeSP Parser::type() {
-    return arrayType();
-}
+TypeSP Parser::type() { return arrayType(); }
 
 TypeSP Parser::functionPointerType() {
-    //TODO
+    // TODO
     TypeSP typeExpr = arrayType();
-    
-    while(match(TokenType::LEFT_PAREN) && typeExpr != nullptr) {
+
+    while (match(TokenType::LEFT_PAREN) && typeExpr != nullptr) {
         consume(TokenType::RIGHT_PAREN, "Expected ')' after function pointer type expression.");
         typeExpr = std::make_shared<FuncPtrType>(typeExpr);
     }
@@ -352,8 +353,8 @@ TypeSP Parser::functionPointerType() {
 
 TypeSP Parser::arrayType() {
     TypeSP typeExpr = basicType();
-    
-    while(match(TokenType::LEFT_SQR) && typeExpr != nullptr) {
+
+    while (match(TokenType::LEFT_SQR) && typeExpr != nullptr) {
         consume(TokenType::RIGHT_SQR, "Expected ']' after array type expression.");
         typeExpr = std::make_shared<ArrayType>(typeExpr);
     }
@@ -410,6 +411,22 @@ const Token &Parser::previous() { return tokens[current - 1]; }
 
 ParseException Parser::error(const Token &token, const char *message) {
     std::string messageString = "(at token \"" + toString(token) + "\"): " + message;
-    reportError(messageString);
+    reportError(token.getLine(), message);
     return ParseException(messageString);
+}
+
+#include <cstdio>
+
+void Parser::reportError(int line, const std::string &message) {
+    std::cout << "[Reported error at line " << line << "] " << message << "\n\n";
+    int min = (line < 3) ? 0 : line - 3;
+    int max = (line > (int) fileLines.size() - 3) ? fileLines.size() : line + 4;
+    std::cout << "----------------------------------------------\n";
+    for (int i = min; i < max; i++) {
+        printf("%5d |", i);
+        if (i == line) std::cout << " --->\t";
+        else std::cout << " \t";
+        std::cout << fileLines[i] << "\n";
+    }
+    std::cout << "----------------------------------------------\n";
 }

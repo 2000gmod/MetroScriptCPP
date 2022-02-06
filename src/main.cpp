@@ -56,10 +56,12 @@ void runFile(std::string filename) {
         exit(EXIT_FAILURE);
     }
     file.close();
+    std::vector<std::string> lines = getFileLines(buffer.str());
 
     std::vector<Token> tokens = tokenizeString(buffer.str());
+
     try {
-        Parser parser(tokens);
+        Parser parser(tokens, lines);
         std::vector<StmtSP> statements = parser.parse();
     } catch (ParseException &) {
         exit(1);

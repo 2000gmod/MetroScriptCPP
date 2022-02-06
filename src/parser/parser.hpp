@@ -17,13 +17,14 @@ class ParseException : public std::exception {
 
 class Parser {
     public:
-        Parser(std::vector<Token> tokens);
+        Parser(std::vector<Token> tokens, std::vector<std::string> fileLines);
         std::vector<StmtSP> parse();
 
     private:
         std::vector<Token> tokens;
+        std::vector<std::string> fileLines;
         int current = 0;
-        
+
         bool isDeclaration();
         StmtSP declaration();
         VarDeclStmtSP varDeclaration(TypeSP type, const Token &name);
@@ -67,6 +68,7 @@ class Parser {
         const Token &peek();
         const Token &previous();
         ParseException error(const Token &token, const char *message);
+        void reportError(int line, const std::string &message);
 };
 
 #endif

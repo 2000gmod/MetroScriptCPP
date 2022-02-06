@@ -7,5 +7,6 @@
 #include "token.hpp"
 
 std::vector<Token> tokenizeString(std::string input);
+std::vector<std::string> getFileLines(std::string fileContent);
 
 #endif
