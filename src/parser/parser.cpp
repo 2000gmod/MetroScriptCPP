@@ -276,7 +276,7 @@ ExprSP Parser::addition() {
 ExprSP Parser::multiplication() {
     ExprSP expr = unary();
 
-    while (match({TokenType::STAR, TokenType::SLASH})) {
+    while (match({TokenType::STAR, TokenType::SLASH, TokenType::MOD})) {
         TokenSP op = std::make_shared<Token>(previous());
         ExprSP right = unary();
         expr = std::make_shared<BinaryExpr>(expr, right, op);
@@ -291,7 +291,28 @@ ExprSP Parser::unary() {
         ExprSP right = unary();
         return std::make_shared<UnaryExpr>(right, op);
     }
-    return callExpr();
+    return casting();
+}
+
+ExprSP Parser::casting() {
+    if (match(TokenType::LEFT_SQR)) {
+        TypeSP typeExpr = type();
+        consume(TokenType::COMMA, "Expected ',' after type in casting expression.");
+        ExprSP expr = expression();
+        consume(TokenType::RIGHT_SQR, "Expected ']' after casting expression.");
+        return std::make_shared<CastingExpr>(typeExpr, expr);
+    }
+    return subscript();
+}
+
+ExprSP Parser::subscript() {
+    ExprSP expr = callExpr();
+    while (match(TokenType::LEFT_SQR)) {
+        ExprSP index = expression();
+        consume(TokenType::RIGHT_SQR, "Expected ']' after index expression for array access expression.");
+        expr = std::make_shared<SubscriptExpr>(expr, index);
+    }
+    return expr;
 }
 
 ExprSP Parser::callExpr() {
@@ -411,7 +432,7 @@ const Token &Parser::previous() { return tokens[current - 1]; }
 
 ParseException Parser::error(const Token &token, const char *message) {
     std::string messageString = "(at token \"" + toString(token) + "\"): " + message;
-    reportError(token.getLine(), message);
+    reportError(token.getLine(), messageString);
     return ParseException(messageString);
 }
 
@@ -421,11 +442,13 @@ void Parser::reportError(int line, const std::string &message) {
     std::cout << "[Reported error at line " << line << "] " << message << "\n\n";
     int min = (line < 3) ? 0 : line - 3;
     int max = (line > (int) fileLines.size() - 3) ? fileLines.size() : line + 4;
-    std::cout << "----------------------------------------------\n";
+    std::cout << "[file view] ----------------------------------\n";
     for (int i = min; i < max; i++) {
         printf("%5d |", i);
-        if (i == line) std::cout << " --->\t";
-        else std::cout << " \t";
+        if (i == line)
+            std::cout << " --->\t";
+        else
+            std::cout << " \t";
         std::cout << fileLines[i] << "\n";
     }
     std::cout << "----------------------------------------------\n";

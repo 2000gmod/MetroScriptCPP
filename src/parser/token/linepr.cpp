@@ -36,8 +36,10 @@ vector<Token> tokenizeString(string input) {
 int countLeadingNewLines(const string &line) {
     int out = 0;
     for (const char c : line) {
-        if (c == '\n') out++;
-        else break;
+        if (c == '\n')
+            out++;
+        else
+            break;
     }
     return out;
 }

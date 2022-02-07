@@ -1,6 +1,4 @@
-
-
-int testFunction() {
+int testFunction(string[] args) {
     int x = 3 + 3 * 8 / anotherFunction(aaaa, 3);
 
 
@@ -9,7 +7,8 @@ int testFunction() {
     }
 
     while (true) {
-        doSomething();
+        x = [int, 3.3];
+        doSomething()[3];
         break;
     }
 

@@ -50,6 +50,8 @@ class Parser {
         ExprSP addition();
         ExprSP multiplication();
         ExprSP unary();
+        ExprSP casting();
+        ExprSP subscript();
         ExprSP callExpr();
         ExprSP finishCallExpr(ExprSP callee);
         ExprSP primaryExpr();
