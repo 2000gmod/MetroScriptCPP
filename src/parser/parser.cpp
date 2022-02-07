@@ -297,6 +297,7 @@ ExprSP Parser::unary() {
 ExprSP Parser::casting() {
     if (match(TokenType::LEFT_SQR)) {
         TypeSP typeExpr = type();
+        if (typeExpr == nullptr) throw error(peek(), "Invalid type expression in cast.");
         consume(TokenType::COMMA, "Expected ',' after type in casting expression.");
         ExprSP expr = expression();
         consume(TokenType::RIGHT_SQR, "Expected ']' after casting expression.");

@@ -3,7 +3,7 @@ int testFunction(string[] args) {
 
 
     for (int i = 9; i < 10; i = i + 1) {
-        anotherFunction(bbbb, 1,5);
+        anotherFunction(bbbb, 1.5);
     }
 
     while (true) {

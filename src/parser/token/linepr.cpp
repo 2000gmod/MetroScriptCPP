@@ -57,7 +57,9 @@ vector<Token> tokenize(string line) {
         greatestValidToken = "";
         tokenToTry = "";
 
+        unsigned short counter = 0;
         for (char c : modifyLine) {
+            if (counter >= MAX_SCANNER_RANGE) break;
             if (c >= 32)
                 tokenToTry += c;
             else
@@ -73,6 +75,7 @@ vector<Token> tokenize(string line) {
                     greatestValidToken.erase(endPos, greatestValidToken.end());
                 }
             }
+            counter++;
         }
 
         if (!greatestValidToken.empty()) {

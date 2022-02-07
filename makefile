@@ -5,7 +5,7 @@ MAINARGS = examples/ptest.mtr
 
 CC = g++
 CFLAGS = -Wall -Wextra -Wpedantic -MMD
-
+MEMPROFILER = valgrind
 
 OBJDIR = obj
 SRCDIR = src
@@ -71,3 +71,7 @@ format:
 	@clang-format-13 -style=file $(SOURCES) $(HEADERS) -i
 	@printf " $(DONE)"
 
+memdiag: $(TARGET)
+	@printf "$(PREFIX) Running $(MEMPROFILER)...\n"
+	@$(MEMPROFILER) $(TARGET) $(MAINARGS)
+	@printf "$(DONE)"
