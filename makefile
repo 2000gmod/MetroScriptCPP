@@ -4,7 +4,7 @@ TARGET = $(OUTDIR)/mscppi
 MAINARGS = examples/ptest.mtr
 
 CC = g++
-CFLAGS = -Wall -Wextra -Wpedantic -MMD
+CFLAGS = -Wall -Wextra -Wpedantic -MMD -g
 MEMPROFILER = valgrind
 
 OBJDIR = obj
@@ -53,7 +53,7 @@ $(OBJDIR):
 .PHONY: clean deepclean run debug
 
 run: $(TARGET)
-	@printf "$(PREFIX) Running target: $(TARGET)\n\n"
+	@printf "$(PREFIX) Running target: $(TARGET) $(MAINARGS)\n\n"
 	@$(TARGET) $(MAINARGS)
 
 clean:

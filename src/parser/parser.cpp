@@ -8,7 +8,7 @@
 #include "stmt/stmt.hpp"
 #include "token/token.hpp"
 
-Parser::Parser(std::vector<Token> tokens, std::vector<std::string> fileLines) {
+Parser::Parser(const std::vector<Token> &tokens, const std::vector<std::string> &fileLines) {
     this->tokens = tokens;
     this->fileLines = fileLines;
 }
@@ -392,8 +392,8 @@ TypeSP Parser::basicType() {
     }
 }
 
-bool Parser::match(std::vector<TokenType> types) {
-    for (TokenType &type : types) {
+bool Parser::match(const std::initializer_list<TokenType> types) {
+    for (const TokenType &type : types) {
         if (check(type)) {
             advance();
             return true;

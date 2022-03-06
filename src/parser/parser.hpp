@@ -6,6 +6,8 @@
 #include "token/token.hpp"
 #include "type/type.hpp"
 
+#include <initializer_list>
+
 class ParseException : public std::exception {
     private:
         std::string message;
@@ -17,7 +19,7 @@ class ParseException : public std::exception {
 
 class Parser {
     public:
-        Parser(std::vector<Token> tokens, std::vector<std::string> fileLines);
+        Parser(const std::vector<Token> &tokens, const std::vector<std::string> &fileLines);
         std::vector<StmtSP> parse();
 
     private:
@@ -61,7 +63,7 @@ class Parser {
         TypeSP arrayType();
         TypeSP basicType();
 
-        bool match(std::vector<TokenType> types);
+        bool match(const std::initializer_list<TokenType> types);
         bool match(TokenType type);
         const Token &consume(TokenType type, const char *message);
         bool check(TokenType type);
