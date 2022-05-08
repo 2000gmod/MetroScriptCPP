@@ -14,7 +14,7 @@ class ExpressionEvaluationException : public std::exception {
         std::string message;
 
     public:
-        explicit ExpressionEvaluationException(std::string message) { this->message = message; }
+        explicit ExpressionEvaluationException(const std::string &message) { this->message = message; }
         const char *what() { return message.c_str(); }
 };
 
@@ -28,7 +28,7 @@ typedef std::shared_ptr<Variable> VariableSP;
 
 class ValueExpr : public Expression {
     public:
-        ValueExpr(TokenSP var) { value = var; };
+        ValueExpr(const TokenSP &var) { value = var; }
         TokenSP value;
 };
 
@@ -36,7 +36,7 @@ typedef std::shared_ptr<ValueExpr> ValueExprSP;
 
 class IdentExpr : public Expression {
     public:
-        IdentExpr(TokenSP id) { name = id; }
+        IdentExpr(const TokenSP &id) { name = id; }
         TokenSP name;
 };
 
@@ -44,7 +44,7 @@ typedef std::shared_ptr<IdentExpr> IdentExprSP;
 
 class UnaryExpr : public Expression {
     public:
-        UnaryExpr(ExprSP expr, TokenSP op) {
+        UnaryExpr(const ExprSP &expr, const TokenSP &op) {
             this->expr = expr;
             this->op = op;
         }
@@ -56,7 +56,7 @@ typedef std::shared_ptr<UnaryExpr> UnaryExprSP;
 
 class AsignExpr : public Expression {
     public:
-        AsignExpr(TokenSP name, ExprSP expr) {
+        AsignExpr(const TokenSP &name, const ExprSP &expr) {
             this->name = name;
             this->expr = expr;
         }
@@ -68,11 +68,11 @@ typedef std::shared_ptr<AsignExpr> AsignExprSP;
 
 class BinaryExpr : public Expression {
     public:
-        BinaryExpr(ExprSP l, ExprSP r, TokenSP op) {
+        BinaryExpr(const ExprSP &l, const ExprSP &r, const TokenSP &op) {
             this->l = l;
             this->r = r;
             this->op = op;
-        };
+        }
         ExprSP l;
         ExprSP r;
         TokenSP op;
@@ -82,7 +82,7 @@ typedef std::shared_ptr<BinaryExpr> BinaryExprSP;
 
 class GroupExpr : public Expression {
     public:
-        GroupExpr(ExprSP expr) { this->expr = expr; };
+        GroupExpr(const ExprSP &expr) { this->expr = expr; }
         ExprSP expr;
 };
 
@@ -90,7 +90,7 @@ typedef std::shared_ptr<GroupExpr> GroupExprSP;
 
 class CallExpr : public Expression {
     public:
-        CallExpr(std::vector<ExprSP> args, ExprSP callee) {
+        CallExpr(const std::vector<ExprSP> &args, const ExprSP &callee) {
             this->args = args;
             this->callee = callee;
         }
@@ -102,7 +102,7 @@ typedef std::shared_ptr<CallExpr> CallExprSP;
 
 class CastingExpr : public Expression {
     public:
-        CastingExpr(TypeSP type, ExprSP expr) {
+        CastingExpr(const TypeSP &type, const ExprSP &expr) {
             this->type = type;
             this->expr = expr;
         }
@@ -114,7 +114,7 @@ typedef std::shared_ptr<CastingExpr> CastingExprSP;
 
 class SubscriptExpr : public Expression {
     public:
-        SubscriptExpr(ExprSP accessed, ExprSP index) {
+        SubscriptExpr(const ExprSP &accessed, const ExprSP &index) {
             this->accessed = accessed;
             this->index = index;
         }
@@ -124,6 +124,6 @@ class SubscriptExpr : public Expression {
 
 typedef std::shared_ptr<SubscriptExpr> SubscriptExprSP;
 
-VariableSP evaluate(ExprSP expr);
+VariableSP evaluate(const ExprSP &expr);
 
 #endif

@@ -1,11 +1,14 @@
 MAKEFLAGS += --no-print-directory
 
-TARGET = $(OUTDIR)/mscppi
-MAINARGS = examples/ptest.mtr
+TARGET_NAME = mscppi
+TARGET = $(OUTDIR)/$(TARGET_NAME)
 
 CC = g++
-CFLAGS = -Wall -Wextra -Wpedantic -MMD -g
+CFLAGS = -Wall -Wextra -Wpedantic -MMD
 MEMPROFILER = valgrind
+FORMATTER = clang-format
+
+MAINARGS = examples/ptest.mtr
 
 OBJDIR = obj
 SRCDIR = src
@@ -16,6 +19,10 @@ SOURCES := $(shell find . -name '*.cpp')
 HEADERS := $(shell find . -name '*.hpp')
 OBJECTS := $(subst .cpp,.o, $(subst ./src,./$(OBJDIR),$(SOURCES)))
 DEPS := $(shell find . -name '*.d')
+
+OUT_FILE = $(TARGET_NAME)_output.txt
+OUT = > $(OUT_FILE)
+
 
 PREFIX = [make]:
 DONE = Done\n
@@ -53,8 +60,14 @@ $(OBJDIR):
 .PHONY: clean deepclean run debug
 
 run: $(TARGET)
-	@printf "$(PREFIX) Running target: $(TARGET) $(MAINARGS)\n\n"
+	@printf "$(PREFIX) Running target: $(TARGET)\n\n"
 	@$(TARGET) $(MAINARGS)
+
+runToFile: $(TARGET)
+	@printf "$(PREFIX) Running target: $(TARGET)\n"
+	@printf "$(PREFIX) Redirecting stdout to: $(OUT_FILE)\n\n"
+	@$(TARGET) $(MAINARGS) $(OUT)
+	
 
 clean:
 	@printf "$(PREFIX) Deleting output directory..."
@@ -68,7 +81,7 @@ deepclean: clean
 	
 format:
 	@printf "$(PREFIX) Formatting all files..."
-	@clang-format-13 -style=file $(SOURCES) $(HEADERS) -i
+	@$(FORMATTER) -style=file $(SOURCES) $(HEADERS) -i
 	@printf " $(DONE)"
 
 memdiag: $(TARGET)

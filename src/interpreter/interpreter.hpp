@@ -2,6 +2,8 @@
 #define INTERPRETER_HPP
 
 #include "../parser/parser.hpp"
+#include "rtvar.hpp"
+#include "env.hpp"
 
 class Interpreter {
     public:
@@ -9,6 +11,10 @@ class Interpreter {
         void run();
         void load();
 
+        VarEnv &globals();
+
+    private:
+        
 };
 
 #endif

@@ -34,6 +34,7 @@ class Variable {
         Variable(double doubleValue);
         Variable(bool boolValue);
         Variable(std::string stringValue);
+        Variable &operator =(const Variable &) = default;
 
         operator std::string();
 };

@@ -4,7 +4,7 @@
 
 #include "../../util/util.hpp"
 
-VariableSP evaluate(ExprSP expr) {
+VariableSP evaluate(const ExprSP &expr) {
     Expression *ptr = expr.get();
 
     if (instanceOf<ValueExpr>(ptr)) {
