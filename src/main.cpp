@@ -10,6 +10,7 @@
 #include "parser/token/linepr.hpp"
 #include "parser/token/token.hpp"
 #include "parser/var/var.hpp"
+#include "interpreter/interpreter.hpp"
 
 void tokenizePrompt() {
     std::cout << "\n# CLI String Tokenizer mode\n";
@@ -63,6 +64,11 @@ void runFile(std::string filename) {
     try {
         Parser parser(tokens, lines);
         std::vector<StmtSP> statements = parser.parse();
+
+        Interpreter inter(statements);
+        inter.load();
+        inter.run();
+        
     } catch (ParseException &) {
         exit(1);
     }

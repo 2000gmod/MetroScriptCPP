@@ -11,10 +11,12 @@ class Interpreter {
         void run();
         void load();
 
-        VarEnv &globals();
 
     private:
-        
+        std::vector<StmtSP> statementList;
+        VarEnv globalEnv, *innermost;
+        void enterMainFunction(const FunctionDeclStmtSP &mainFun);
+        void runFunction(const FunctionDeclStmtSP &fun);
 };
 
 #endif

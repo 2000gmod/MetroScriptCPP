@@ -4,6 +4,7 @@
 #include "../parser/type/type.hpp"
 #include "../parser/var/var.hpp"
 
+
 struct RuntimeVariable {
     ~RuntimeVariable() = default;
 };

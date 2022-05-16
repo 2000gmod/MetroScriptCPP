@@ -8,7 +8,7 @@ CFLAGS = -Wall -Wextra -Wpedantic -MMD
 MEMPROFILER = valgrind
 FORMATTER = clang-format
 
-MAINARGS = examples/ptest.mtr
+MAINARGS = examples/helloworld.mtr
 
 OBJDIR = obj
 SRCDIR = src
