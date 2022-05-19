@@ -74,3 +74,7 @@ bool operator &&(const PrimitiveVar &lhs, const PrimitiveVar &rhs) {
 bool operator ||(const PrimitiveVar &lhs, const PrimitiveVar &rhs) {
     return lhs.value || rhs.value;
 }
+
+std::string PrimitiveVar::toString() const {
+    return value.operator std::string();
+}

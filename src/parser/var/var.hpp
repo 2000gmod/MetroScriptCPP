@@ -36,7 +36,7 @@ class Variable {
         Variable(std::string stringValue);
         Variable &operator =(const Variable &) = default;
 
-        operator std::string();
+        operator std::string() const;
 };
 
 Variable operator+(const Variable &a, const Variable &b);

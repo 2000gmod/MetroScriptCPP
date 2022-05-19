@@ -68,7 +68,7 @@ Variable::Variable(std::string stringValue) {
     this->stringValue = stringValue;
 }
 
-Variable::operator std::string() {
+Variable::operator std::string() const {
     switch (activeMember) {
         case 'i':
             return std::to_string(intValue);
@@ -225,6 +225,7 @@ bool operator <(const Variable &a, const Variable &b) {
     if (t1 == 'i' && t2 == 'd') return a.intValue < b.doubleValue;
     if (t1 == 'd' && t2 == 'i') return a.doubleValue < b.intValue;
     if (t1 == 'd' && t2 == 'd') return a.doubleValue < b.doubleValue;
+    return false;
 }
 
 bool operator >(const Variable &a, const Variable &b) {

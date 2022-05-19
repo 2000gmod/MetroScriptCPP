@@ -9,6 +9,7 @@
 
 struct RuntimeVariable {
     ~RuntimeVariable() = default;
+    virtual std::string toString() const = 0;
 };
 
 typedef std::shared_ptr<RuntimeVariable> RTimeVarSP;
@@ -58,6 +59,25 @@ struct PrimitiveVar : public RuntimeVariable {
         value.activeMember = 'b';
     }
 
+    PrimitiveVar(int val) {
+        type = std::make_shared<BasicType>(std::make_shared<Token>("int"));
+        value.intValue = val;
+        value.activeMember = 'i';
+    }
+
+    PrimitiveVar(double val) {
+        type = std::make_shared<BasicType>(std::make_shared<Token>("double"));
+        value.doubleValue = val;
+        value.activeMember = 'i';
+    }
+
+    PrimitiveVar(const std::string &val) {
+        type = std::make_shared<BasicType>(std::make_shared<Token>("string"));
+        value.stringValue = val;
+        value.activeMember = 's';
+    }
+
+
     const std::string getType() const {
         return type->name->getTypeName();
     }
@@ -65,6 +85,8 @@ struct PrimitiveVar : public RuntimeVariable {
     bool isNumeric() const {
         return (type->name->getTypeName() == "int" || type->name->getTypeName() == "double");
     }
+
+    virtual std::string toString() const override;
 };
 
 PrimitiveVar &operator +(PrimitiveVar &rhs);

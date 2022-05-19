@@ -54,6 +54,9 @@ class Interpreter {
         RTimeVarSP evalSubscriptExpr(const ExprSP &e);
         
         bool isTrue(const ExprSP &e);
+
+        void interceptBuiltIns(const std::string &name, const std::vector<ExprSP> &args);
+        void internalPrint(const std::vector<ExprSP> &args);
 };
 
 #endif

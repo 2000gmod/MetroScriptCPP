@@ -12,7 +12,7 @@ VarEnv::VarEnv(VarEnv &enclosing) {
 RTimeVarSP &VarEnv::getVar(const std::string &name) {
     if (values.count(name) == 0) {
         if (enclosing == nullptr) throw RuntimeException(std::string("Variable not found: ") + name);
-        else enclosing->getVar(name);
+        else return enclosing->getVar(name);
     }
     else return values[name];
 }
@@ -20,7 +20,7 @@ RTimeVarSP &VarEnv::getVar(const std::string &name) {
 FunctionDeclStmtSP &VarEnv::getFun(const std::string &name) {
     if (funcs.count(name) == 0) {
         if (enclosing == nullptr) throw RuntimeException(std::string("Function not found: ") + name);
-        else enclosing->getFun(name);
+        else return enclosing->getFun(name);
     }
     else return funcs[name];
 }

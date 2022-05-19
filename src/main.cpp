@@ -69,8 +69,13 @@ void runFile(std::string filename) {
         inter.load();
         inter.run();
         
-    } catch (ParseException &) {
+    } 
+    catch (ParseException &) {
         exit(1);
+    }
+    catch (RuntimeException &e) {
+        std::cout << e.what() << "\n";
+        exit(EXIT_FAILURE);
     }
 }
 

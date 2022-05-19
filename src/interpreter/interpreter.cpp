@@ -45,7 +45,7 @@ void Interpreter::enterMainFunction(const FunctionDeclStmtSP &mainFun) {
         runFunction(mainFun);
     }
     catch (ReturnValueContainer) {
-        std::cout << "Finished!\n";
+        //std::cout << "Finished!\n";
     }
 }
 
@@ -192,7 +192,29 @@ RTimeVarSP Interpreter::evaluateExpr(const ExprSP &e) {
 }
 
 RTimeVarSP Interpreter::evalValueExpr(const ExprSP &e) {
-    return std::make_shared<PrimitiveVar>(std::dynamic_pointer_cast<ValueExpr>(e));
+    auto *ptr = (ValueExpr*) e.get();
+    auto tok = ptr->value;
+    auto type = tok->getType();
+    BasicTypeSP typeExpr;
+
+    switch(type) {
+        case TokenType::INT_LIT:
+            typeExpr = std::make_shared<BasicType>(std::make_shared<Token>("int"));
+            break;
+        case TokenType::DOUBLE_LIT:
+            typeExpr = std::make_shared<BasicType>(std::make_shared<Token>("double"));
+            break;
+        case TokenType::STRING_LIT:
+            typeExpr = std::make_shared<BasicType>(std::make_shared<Token>("string"));
+            break;
+        case TokenType::BOOL_LIT:
+            typeExpr = std::make_shared<BasicType>(std::make_shared<Token>("bool"));
+            break;
+        default:
+            throw RuntimeException("Invalid value expression.");
+    }
+    
+   return std::make_shared<PrimitiveVar>(*evaluate(e), typeExpr);
 }
 
 RTimeVarSP Interpreter::evalIdentExpr(const ExprSP &e) {
@@ -232,6 +254,7 @@ RTimeVarSP Interpreter::evalBinaryExpr(const ExprSP &e) {
     auto left = std::make_shared<PrimitiveVar>(evaluateExpr(ep->l));
     auto right = std::make_shared<PrimitiveVar>(evaluateExpr(ep->r));
     auto &op = ep->op;
+    
 
     switch (op->getType()) {
         case TokenType::PLUS:
@@ -271,17 +294,56 @@ RTimeVarSP Interpreter::evalGroupExpr(const ExprSP &e) {
 }
 
 RTimeVarSP Interpreter::evalCallExpr(const ExprSP &e) {
-    return std::make_shared<PrimitiveVar>(Variable(3), nullptr);
+    auto *ptr = (CallExpr*) e.get();
+
+    if (!instanceOf<IdentExpr>(ptr->callee.get())) {
+        throw RuntimeException("Only identifiers are valid function names.");
+    }
+
+    auto *idptr = (IdentExpr*) ptr->callee.get();
+    const std::string &name = idptr->name->getName();
+
+    try {
+        interceptBuiltIns(name, ptr->args);
+    }
+    catch (ReturnValueContainer e) {
+        return e.value;
+    }
+
+    const auto &fun = innermost->getFun(name);
+
+    if (ptr->args.size() != fun->parameters.size()) {
+        throw RuntimeException("Invalid number of arguments.");
+    }
+    return std::make_shared<PrimitiveVar>("Placeholder");
 }
 
 RTimeVarSP Interpreter::evalCastingExpr(const ExprSP &e) {
-
+    auto *ptr = (CastingExpr*) e.get();
+    return evaluateExpr(ptr->expr);
 }
 
 RTimeVarSP Interpreter::evalSubscriptExpr(const ExprSP &e) {
-
+    auto *ptr = (SubscriptExpr*) e.get();
+    return evaluateExpr(ptr->index);
 }
 
 bool Interpreter::isTrue(const ExprSP &e) {
+    e.get();
+    return false;
+}
 
+void Interpreter::interceptBuiltIns(const std::string &name, const std::vector<ExprSP> &args) {
+    if (name == "print") internalPrint(args);
+    return;
+}
+
+void Interpreter::internalPrint(const std::vector<ExprSP> &args) {
+    if (args.size() == 0) return;
+    //std::cout << args.size() << "\n";
+
+    for (const auto &e : args) {
+        std::cout << evaluateExpr(e)->toString();
+    }
+    throw ReturnValueContainer(nullptr);
 }
