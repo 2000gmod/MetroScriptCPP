@@ -1,4 +1,5 @@
 #include "env.hpp"
+#include "interpreter.hpp"
 
 VarEnv::VarEnv() { 
     enclosing = nullptr;
@@ -9,11 +10,19 @@ VarEnv::VarEnv(VarEnv &enclosing) {
 }
 
 RTimeVarSP &VarEnv::getVar(const std::string &name) {
-    return values[name];
+    if (values.count(name) == 0) {
+        if (enclosing == nullptr) throw RuntimeException(std::string("Variable not found: ") + name);
+        else enclosing->getVar(name);
+    }
+    else return values[name];
 }
 
 FunctionDeclStmtSP &VarEnv::getFun(const std::string &name) {
-    return funcs[name];
+    if (funcs.count(name) == 0) {
+        if (enclosing == nullptr) throw RuntimeException(std::string("Function not found: ") + name);
+        else enclosing->getFun(name);
+    }
+    else return funcs[name];
 }
 
 void VarEnv::assignVar(const std::string &name, const RTimeVarSP &value) {

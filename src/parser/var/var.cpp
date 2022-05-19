@@ -86,7 +86,7 @@ Variable::operator std::string() {
     }
 }
 
-Variable operator+(Variable &a, Variable &b) {
+Variable operator+(const Variable &a, const Variable &b) {
     switch (a.activeMember) {
         case 'i':
             if (b.activeMember == 'i')
@@ -94,27 +94,26 @@ Variable operator+(Variable &a, Variable &b) {
             else if (b.activeMember == 'd')
                 return Variable(a.intValue + b.doubleValue);
             else
-                goto error;
+                break;
         case 'd':
             if (b.activeMember == 'i')
                 return Variable(a.doubleValue + b.intValue);
             else if (b.activeMember == 'd')
                 return Variable(a.doubleValue + b.doubleValue);
             else
-                goto error;
+                break;
         case 'b':
-            goto error;
+            break;
         case 's':
             if (b.activeMember == 's')
                 return Variable(a.stringValue + b.stringValue);
             else
-                goto error;
+                break;
     }
-error:
     throw OperationTypeException("Invalid types for (+) operator.");
 }
 
-Variable operator-(Variable &a, Variable &b) {
+Variable operator-(const Variable &a, const Variable &b) {
     switch (a.activeMember) {
         case 'i':
             if (b.activeMember == 'i')
@@ -122,23 +121,22 @@ Variable operator-(Variable &a, Variable &b) {
             else if (b.activeMember == 'd')
                 return Variable(a.intValue - b.doubleValue);
             else
-                goto error;
+                break;
         case 'd':
             if (b.activeMember == 'i')
                 return Variable(a.doubleValue - b.intValue);
             else if (b.activeMember == 'd')
                 return Variable(a.doubleValue - b.doubleValue);
             else
-                goto error;
+                break;
         case 'b':
         case 's':
-            goto error;
+            break;
     }
-error:
     throw OperationTypeException("Invalid types for (-) operator.");
 }
 
-Variable operator*(Variable &a, Variable &b) {
+Variable operator*(const Variable &a, const Variable &b) {
     switch (a.activeMember) {
         case 'i':
             if (b.activeMember == 'i')
@@ -146,22 +144,21 @@ Variable operator*(Variable &a, Variable &b) {
             else if (b.activeMember == 'd')
                 return Variable(a.intValue * b.doubleValue);
             else
-                goto error;
+                break;
         case 'd':
             if (b.activeMember == 'i')
                 return Variable(a.doubleValue * b.intValue);
             else if (b.activeMember == 'd')
                 return Variable(a.doubleValue * b.doubleValue);
             else
-                goto error;
+                break;
         case 'b':
         case 's':
-            goto error;
+            break;
     }
-error:
     throw OperationTypeException("Invalid types for (*) operator.");
 }
-Variable operator/(Variable &a, Variable &b) {
+Variable operator/(const Variable &a, const Variable &b) {
     switch (a.activeMember) {
         case 'i':
             if (b.activeMember == 'i')
@@ -169,33 +166,89 @@ Variable operator/(Variable &a, Variable &b) {
             else if (b.activeMember == 'd')
                 return Variable(a.intValue / b.doubleValue);
             else
-                goto error;
+                break;
         case 'd':
             if (b.activeMember == 'i')
                 return Variable(a.doubleValue / b.intValue);
             else if (b.activeMember == 'd')
                 return Variable(a.doubleValue / b.doubleValue);
             else
-                goto error;
+                break;
         case 'b':
         case 's':
-            goto error;
+            break;
     }
-error:
     throw OperationTypeException("Invalid types for (/) operator.");
 }
-Variable operator%(Variable &a, Variable &b) {
+Variable operator%(const Variable &a, const Variable &b) {
     switch (a.activeMember) {
         case 'i':
             if (b.activeMember == 'i')
                 return Variable(a.intValue % b.intValue);
             else
-                goto error;
+                break;
         case 'd':
         case 'b':
         case 's':
-            goto error;
+            break;
     }
-error:
     throw OperationTypeException("Invalid types for (%) operator.");
+}
+
+bool operator ==(const Variable &a, const Variable &b) {
+    if (a.activeMember != b.activeMember) throw OperationTypeException("Comparing different types.");
+    switch (a.activeMember) {
+        case 'i':
+            return a.intValue == b.intValue;
+        case 'd':
+            return a.doubleValue == b.doubleValue;
+        case 's':
+            return a.stringValue == b.stringValue;
+        case 'b':
+            return a.boolValue == b.boolValue;
+    }
+    return false;
+}
+
+bool operator !=(const Variable &a, const Variable &b) {
+    return !(a == b);
+}
+
+bool operator <(const Variable &a, const Variable &b) {
+    if (!((a.activeMember == 'i' || a.activeMember == 'd') && (b.activeMember == 'i' || b.activeMember == 'd'))) {
+        throw OperationTypeException("Invalid types for relational operator");
+    }
+    char t1 = a.activeMember;
+    char t2 = b.activeMember;
+
+    if (t1 == 'i' && t2 == 'i') return a.intValue < b.intValue;
+    if (t1 == 'i' && t2 == 'd') return a.intValue < b.doubleValue;
+    if (t1 == 'd' && t2 == 'i') return a.doubleValue < b.intValue;
+    if (t1 == 'd' && t2 == 'd') return a.doubleValue < b.doubleValue;
+}
+
+bool operator >(const Variable &a, const Variable &b) {
+    return (!(a < b) && a != b);
+}
+
+bool operator >=(const Variable &a, const Variable &b) {
+    return !(a < b);
+}
+
+bool operator <=(const Variable &a, const Variable &b) {
+    return !(a > b);
+}
+
+bool operator ||(const Variable &a, const Variable &b) {
+    if (a.activeMember != 'b' || b.activeMember != 'b') {
+        throw OperationTypeException("Can only OR bool types.");
+    }
+    return a.boolValue || b.boolValue;
+}
+
+bool operator &&(const Variable &a, const Variable &b) {
+    if (a.activeMember != 'b' || b.activeMember != 'b') {
+        throw OperationTypeException("Can only AND bool types.");
+    }
+    return a.boolValue && b.boolValue;
 }

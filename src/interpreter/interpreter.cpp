@@ -5,6 +5,7 @@
 
 Interpreter::Interpreter(const std::vector<StmtSP> &statements) {
     statementList = statements;
+    innermost = &globalEnv;
 }
 
 void Interpreter::run() {
@@ -33,19 +34,254 @@ void Interpreter::load() {
     }
 }
 
+
 void Interpreter::enterMainFunction(const FunctionDeclStmtSP &mainFun) {
     VarEnv mainScope(globalEnv);
     innermost = &mainScope;
     
     // Handle main args here
 
-    runFunction(mainFun);
+    try {
+        runFunction(mainFun);
+    }
+    catch (ReturnValueContainer) {
+        std::cout << "Finished!\n";
+    }
 }
 
 void Interpreter::runFunction(const FunctionDeclStmtSP &fun) {
-    auto *block = (BlockStmt*) fun->body.get();
+    runStatement(fun->body);
+};
+
+void Interpreter::runStatement(const StmtSP &s) {
+    auto *sptr = s.get();
+
+    if (instanceOf<BlockStmt>(sptr)) {
+        runBlockStmt(s);
+    }
+    else if (instanceOf<ExprStmt>(sptr)) {
+        runExprStmt(s);
+    }
+    else if (instanceOf<ReturnStmt>(sptr)) {
+        runReturnStmt(s);
+    }
+    else if (instanceOf<VarDeclStmt>(sptr)) {
+        runVarDeclStmt(s);
+    }
+    else if (instanceOf<IfStmt>(sptr)) {
+        runIfStmt(s);
+    }
+    else if (instanceOf<WhileStmt>(sptr)) {
+        runWhileStmt(s);
+    }
+    else if (instanceOf<BreakStmt>(sptr)) {
+        runBreakStmt();
+    }
+    else if (instanceOf<ContinueStmt>(sptr)) {
+        runContinueStmt();
+    } 
+    else {
+        reportError("Invalid statement.");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void Interpreter::runBlockStmt(const StmtSP &s) {
+    VarEnv newScope(*innermost);
+    
+    auto *block = (BlockStmt*) s.get();
 
     for (const auto &s : block->statements) {
-        std::cout << s << "\n";
+        runStatement(s);
     }
+
+    innermost = newScope.enclosing;
+}
+
+void Interpreter::runExprStmt(const StmtSP &s) {
+    auto *expr = (ExprStmt*) s.get();
+    evaluateExpr(expr->expr);
+}
+
+void Interpreter::runReturnStmt(const StmtSP &s) {
+    auto *rstmt = (ReturnStmt*) s.get();
+    throw ReturnValueContainer(
+            rstmt->value == nullptr ? nullptr : evaluateExpr(rstmt->value)
+        );
+}
+
+void Interpreter::runVarDeclStmt(const StmtSP &s) {
+    auto *decl = (VarDeclStmt*) s.get();
+    auto expr = std::make_shared<PrimitiveVar>(evaluateExpr(decl->value));
+    innermost->defineVar(decl->name->getName(), expr);
+}
+
+void Interpreter::runIfStmt(const StmtSP &s) {
+    auto *ifst = (IfStmt*) s.get();
+    if (isTrue(ifst->condition)) {
+        runStatement(ifst->ifBody);
+    }
+    else runStatement(ifst->elseBody);
+}
+
+void Interpreter::runWhileStmt(const StmtSP &s) {
+    auto *whst = (WhileStmt*) s.get();
+
+    while (isTrue(whst->condition)) {
+        try {
+            runStatement(whst->body);
+        }
+        catch (LoopControlException e) {
+            if (!e.isContinue) {
+                return;
+            }
+            else {
+                if (!whst->isForLoop) continue;
+                else {
+                    auto *block = (BlockStmt*) whst->body.get();
+                    runStatement(block->statements.back());
+                    continue;
+                }
+            }
+        }
+    }
+}
+
+void Interpreter::runBreakStmt() {
+    throw LoopControlException(false);
+}
+
+void Interpreter::runContinueStmt() {
+    throw LoopControlException(true);
+}
+
+RTimeVarSP Interpreter::evaluateExpr(const ExprSP &e) {
+    auto *ptr = e.get();
+    
+    if (instanceOf<ValueExpr>(ptr)) {
+        return evalValueExpr(e);
+    }
+    else if (instanceOf<IdentExpr>(ptr)) {
+        return evalIdentExpr(e);
+    }
+    else if (instanceOf<UnaryExpr>(ptr)) {
+        return evalUnaryExpr(e);
+    }
+    else if (instanceOf<AsignExpr>(ptr)) {
+        return evalAsignExpr(e);
+    }
+    else if (instanceOf<BinaryExpr>(ptr)) {
+        return evalBinaryExpr(e);
+    }
+    else if (instanceOf<GroupExpr>(ptr)) {
+        return evalGroupExpr(e);
+    }
+    else if (instanceOf<CallExpr>(ptr)) {
+        return evalCallExpr(e);
+    }
+    else if (instanceOf<CastingExpr>(ptr)) {
+        return evalCastingExpr(e);
+    }
+    else if (instanceOf<SubscriptExpr>(ptr)) {
+        return evalSubscriptExpr(e);
+    }
+    else {
+        reportError("Invalid expression.");
+        exit(EXIT_FAILURE);
+    }
+}
+
+RTimeVarSP Interpreter::evalValueExpr(const ExprSP &e) {
+    return std::make_shared<PrimitiveVar>(std::dynamic_pointer_cast<ValueExpr>(e));
+}
+
+RTimeVarSP Interpreter::evalIdentExpr(const ExprSP &e) {
+    auto *ptr = (IdentExpr*) e.get();
+    return (innermost->getVar(ptr->name->getName()));
+}
+
+RTimeVarSP Interpreter::evalUnaryExpr(const ExprSP &e) {
+    auto ep = std::dynamic_pointer_cast<UnaryExpr>(e);
+    PrimitiveVar out(evaluateExpr(ep->expr));
+    switch(ep->op->getType()) {
+        case TokenType::PLUS:
+            out = +out;
+            break;
+        case TokenType::MINUS:
+            out = -out;
+            break;
+        case TokenType::NOT:
+            out = !out;
+            break;
+        default:
+            break;
+    }
+    return std::make_shared<PrimitiveVar>(out);
+}
+
+RTimeVarSP Interpreter::evalAsignExpr(const ExprSP &e) {
+    auto ep = std::dynamic_pointer_cast<AsignExpr>(e);
+    auto out = std::make_shared<PrimitiveVar>(evaluateExpr(ep->expr));
+
+    innermost->assignVar(ep->name->getName(), out);
+    return out;
+}
+
+RTimeVarSP Interpreter::evalBinaryExpr(const ExprSP &e) {
+    auto ep = std::dynamic_pointer_cast<BinaryExpr>(e);
+    auto left = std::make_shared<PrimitiveVar>(evaluateExpr(ep->l));
+    auto right = std::make_shared<PrimitiveVar>(evaluateExpr(ep->r));
+    auto &op = ep->op;
+
+    switch (op->getType()) {
+        case TokenType::PLUS:
+            return std::make_shared<PrimitiveVar>(*left + *right);
+        case TokenType::MINUS:
+            return std::make_shared<PrimitiveVar>(*left - *right);
+        case TokenType::STAR:
+            return std::make_shared<PrimitiveVar>(*left * *right);
+        case TokenType::SLASH:
+            return std::make_shared<PrimitiveVar>(*left / *right);
+        case TokenType::MOD:
+            return std::make_shared<PrimitiveVar>(*left % *right);
+        case TokenType::EQ:
+            return std::make_shared<PrimitiveVar>(*left == *right);
+        case TokenType::NOT_EQ:
+            return std::make_shared<PrimitiveVar>(*left != *right);
+        case TokenType::GT:
+            return std::make_shared<PrimitiveVar>(*left > *right);
+        case TokenType::GEQ:
+            return std::make_shared<PrimitiveVar>(*left >= *right);
+        case TokenType::LT:
+            return std::make_shared<PrimitiveVar>(*left < *right);
+        case TokenType::LEQ:
+            return std::make_shared<PrimitiveVar>(*left <= *right);
+        case TokenType::AND:
+            return std::make_shared<PrimitiveVar>(*left && *right);
+        case TokenType::OR:
+            return std::make_shared<PrimitiveVar>(*left || *right);
+        default:
+            throw RuntimeException("Invalid binary expr.");
+    }
+}
+
+RTimeVarSP Interpreter::evalGroupExpr(const ExprSP &e) {
+    auto *ptr = (GroupExpr*) e.get();
+    return(evaluateExpr(ptr->expr));
+}
+
+RTimeVarSP Interpreter::evalCallExpr(const ExprSP &e) {
+    return std::make_shared<PrimitiveVar>(Variable(3), nullptr);
+}
+
+RTimeVarSP Interpreter::evalCastingExpr(const ExprSP &e) {
+
+}
+
+RTimeVarSP Interpreter::evalSubscriptExpr(const ExprSP &e) {
+
+}
+
+bool Interpreter::isTrue(const ExprSP &e) {
+
 }

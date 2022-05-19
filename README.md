@@ -26,7 +26,6 @@ An imperative, statically typed, interpreted language, primarily designed for CL
 
 The following features are to be implemented:
 
-* Static typing.
 * Function overloading.
 * Typed function pointers (return type is strongly typed, argument type and number is dynamic).
 * Object oriented programming.

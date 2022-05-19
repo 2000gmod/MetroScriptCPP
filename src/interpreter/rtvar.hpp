@@ -3,7 +3,9 @@
 
 #include "../parser/type/type.hpp"
 #include "../parser/var/var.hpp"
-
+#include "../parser/expr/expr.hpp"
+#include "../util/util.hpp"
+#include "rtexcept.hpp"
 
 struct RuntimeVariable {
     ~RuntimeVariable() = default;
@@ -20,7 +22,70 @@ struct PrimitiveVar : public RuntimeVariable {
         this->value = value;
         this->type = type;
     }
+
+    PrimitiveVar(const ValueExprSP &valExpr) {
+        value = *(valExpr->value);
+        const char *typeString;
+        switch(valExpr->value->getType()) {
+            case TokenType::INT_LIT:
+                typeString = "int";
+                break;
+            case TokenType::DOUBLE_LIT:
+                typeString = "double";
+                break;
+            case TokenType::STRING_LIT:
+                typeString = "string";
+                break;
+            case TokenType::BOOL_LIT:
+                typeString = "bool";
+                break;
+            default:
+                break;
+        }
+        type->name = std::make_shared<Token>(Token(typeString));
+    }
+
+    PrimitiveVar(const RTimeVarSP &rt) {
+        auto *rtp = (PrimitiveVar*) rt.get();
+        if (!instanceOf<PrimitiveVar>(rtp)) throw RuntimeException("Trying to initialize primitive value with non primitive.");
+        this->type = rtp->type;
+        this->value = rtp->value;
+    }
+
+    PrimitiveVar(bool val) {
+        type = std::make_shared<BasicType>(std::make_shared<Token>("bool"));
+        value.boolValue = val;
+        value.activeMember = 'b';
+    }
+
+    const std::string getType() const {
+        return type->name->getTypeName();
+    }
+
+    bool isNumeric() const {
+        return (type->name->getTypeName() == "int" || type->name->getTypeName() == "double");
+    }
 };
+
+PrimitiveVar &operator +(PrimitiveVar &rhs);
+PrimitiveVar &operator -(PrimitiveVar &rhs);
+PrimitiveVar &operator !(PrimitiveVar &rhs);
+
+PrimitiveVar operator +(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+PrimitiveVar operator -(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+PrimitiveVar operator *(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+PrimitiveVar operator /(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+PrimitiveVar operator %(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+
+bool operator ==(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+bool operator !=(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+bool operator <(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+bool operator >(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+bool operator >=(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+bool operator <=(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+
+bool operator &&(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
+bool operator ||(const PrimitiveVar &lhs, const PrimitiveVar &rhs);
 
 typedef std::shared_ptr<PrimitiveVar> PrimitiveVarSP;
 

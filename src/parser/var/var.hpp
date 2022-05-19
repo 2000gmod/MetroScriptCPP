@@ -39,10 +39,22 @@ class Variable {
         operator std::string();
 };
 
-Variable operator+(Variable &a, Variable &b);
-Variable operator-(Variable &a, Variable &b);
-Variable operator*(Variable &a, Variable &b);
-Variable operator/(Variable &a, Variable &b);
-Variable operator%(Variable &a, Variable &b);
+Variable operator+(const Variable &a, const Variable &b);
+Variable operator-(const Variable &a, const Variable &b);
+Variable operator*(const Variable &a, const Variable &b);
+Variable operator/(const Variable &a, const Variable &b);
+Variable operator%(const Variable &a, const Variable &b);
+
+bool operator ==(const Variable &a, const Variable &b);
+bool operator !=(const Variable &a, const Variable &b);
+bool operator <(const Variable &a, const Variable &b);
+bool operator >(const Variable &a, const Variable &b);
+bool operator >=(const Variable &a, const Variable &b);
+bool operator <=(const Variable &a, const Variable &b);
+
+bool operator ||(const Variable &a, const Variable &b);
+bool operator &&(const Variable &a, const Variable &b);
+
+
 
 #endif
