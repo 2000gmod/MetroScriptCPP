@@ -51,7 +51,7 @@ void Interpreter::enterMainFunction(const FunctionDeclStmtSP &mainFun) {
 
 void Interpreter::runFunction(const FunctionDeclStmtSP &fun) {
     runStatement(fun->body);
-};
+}
 
 void Interpreter::runStatement(const StmtSP &s) {
     auto *sptr = s.get();
