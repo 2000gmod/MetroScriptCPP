@@ -88,6 +88,7 @@ void Interpreter::runStatement(const StmtSP &s) {
 
 void Interpreter::runBlockStmt(const StmtSP &s) {
     VarEnv newScope(*innermost);
+    innermost = &newScope;
     
     auto *block = (BlockStmt*) s.get();
 
@@ -315,7 +316,25 @@ RTimeVarSP Interpreter::evalCallExpr(const ExprSP &e) {
     if (ptr->args.size() != fun->parameters.size()) {
         throw RuntimeException("Invalid number of arguments.");
     }
-    return std::make_shared<PrimitiveVar>("Placeholder");
+    //return std::make_shared<PrimitiveVar>("Placeholder");
+
+    VarEnv newScope(*innermost);
+    innermost = &newScope;
+
+    RTimeVarSP out;
+    try {
+        int i = 0;
+        for (auto &arg : ptr->args) {
+            newScope.defineVar(std::get<1>(fun->parameters[i])->getName(), evaluateExpr(arg));
+            i++;
+        }
+        runFunction(fun);
+    }
+    catch (ReturnValueContainer &e) {
+        out = e.value;
+    }
+    innermost = newScope.enclosing;
+    return out;
 }
 
 RTimeVarSP Interpreter::evalCastingExpr(const ExprSP &e) {
@@ -329,8 +348,8 @@ RTimeVarSP Interpreter::evalSubscriptExpr(const ExprSP &e) {
 }
 
 bool Interpreter::isTrue(const ExprSP &e) {
-    e.get();
-    return false;
+    PrimitiveVar expr(evaluateExpr(e));
+    return expr && true;
 }
 
 void Interpreter::interceptBuiltIns(const std::string &name, const std::vector<ExprSP> &args) {

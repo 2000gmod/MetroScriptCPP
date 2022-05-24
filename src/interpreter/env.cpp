@@ -26,6 +26,10 @@ FunctionDeclStmtSP &VarEnv::getFun(const std::string &name) {
 }
 
 void VarEnv::assignVar(const std::string &name, const RTimeVarSP &value) {
+    if (values.count(name) == 0) {
+        if (enclosing == nullptr) throw RuntimeException(std::string("Variable not previously defined: ") + name);
+        else return enclosing->assignVar(name, value);
+    } 
     values.insert_or_assign(name, value);
 }
 

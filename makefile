@@ -4,7 +4,7 @@ TARGET_NAME = mscppi
 TARGET = $(OUTDIR)/$(TARGET_NAME)
 
 CC = g++
-CFLAGS = -Wall -Wextra -Wpedantic -MMD -O2
+CFLAGS = -Wall -Wextra -Wpedantic -MMD -O3
 MEMPROFILER = valgrind
 FORMATTER = clang-format
 
