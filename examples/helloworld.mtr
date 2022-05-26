@@ -6,8 +6,31 @@ int fact(int n) {
     else return n * fact(n - 1);
 }
 
+double sqrt(double num) {
+    double x = num;
+    
+    for (int i = 0; i < 5; i = i + 1) {
+        x = x - (x * x - num) / (2 * x);
+    }
+    return x;
+}
+
+bool isPrime(int n) {
+    if (n == 0) return false;
+    for (int i = 2; i < sqrt(n); i = i + 1) {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
+
+void primeSearch(int max) {
+    for (int i = 0; i < max; i = i + 1) {
+        if (isPrime(i)) print(i, "\n");
+    }
+}
+
 void main() {
-    print("Hello World! ", fact(10), "\n");
+    primeSearch(1000);
 
     return;
 }

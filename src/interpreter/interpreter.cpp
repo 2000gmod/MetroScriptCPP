@@ -122,7 +122,7 @@ void Interpreter::runIfStmt(const StmtSP &s) {
     if (isTrue(ifst->condition)) {
         runStatement(ifst->ifBody);
     }
-    else runStatement(ifst->elseBody);
+    else if (ifst->elseBody != nullptr) runStatement(ifst->elseBody);
 }
 
 void Interpreter::runWhileStmt(const StmtSP &s) {
