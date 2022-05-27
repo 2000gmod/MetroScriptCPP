@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "../../util/util.hpp"
+#include "../../interpreter/interpreter.hpp"
 
 VariableSP evaluate(const ExprSP &expr) {
     Expression *ptr = expr.get();
@@ -88,4 +89,56 @@ VariableSP evaluate(const ExprSP &expr) {
 
     else
         throw ExpressionEvaluationException("Unknown type of expression.");
+}
+
+ValueExpr::ValueExpr(const TokenSP &var) { 
+    value = var;
+    evalFunction = &Interpreter::evalValueExpr;
+}
+
+IdentExpr::IdentExpr(const TokenSP &id) { 
+    name = id; 
+    evalFunction = &Interpreter::evalIdentExpr;
+}
+
+UnaryExpr::UnaryExpr(const ExprSP &expr, const TokenSP &op) {
+    this->expr = expr;
+    this->op = op;
+    evalFunction = &Interpreter::evalUnaryExpr;
+}
+
+AsignExpr::AsignExpr(const TokenSP &name, const ExprSP &expr) {
+    this->name = name;
+    this->expr = expr;
+    evalFunction = &Interpreter::evalAsignExpr;
+}
+
+BinaryExpr::BinaryExpr(const ExprSP &l, const ExprSP &r, const TokenSP &op) {
+    this->l = l;
+    this->r = r;
+    this->op = op;
+    evalFunction = &Interpreter::evalBinaryExpr;
+}
+
+GroupExpr::GroupExpr(const ExprSP &expr) { 
+    this->expr = expr;
+    evalFunction = &Interpreter::evalGroupExpr;
+}
+
+CallExpr::CallExpr(const std::vector<ExprSP> &args, const ExprSP &callee) {
+    this->args = args;
+    this->callee = callee;
+    evalFunction = &Interpreter::evalCallExpr;
+}
+
+CastingExpr::CastingExpr(const TypeSP &type, const ExprSP &expr) {
+    this->type = type;
+    this->expr = expr;
+    evalFunction = &Interpreter::evalCastingExpr;
+}
+
+SubscriptExpr::SubscriptExpr(const ExprSP &accessed, const ExprSP &index) {
+    this->accessed = accessed;
+    this->index = index;
+    evalFunction = &Interpreter::evalSubscriptExpr;
 }

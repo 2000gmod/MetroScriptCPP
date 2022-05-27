@@ -158,8 +158,10 @@ void Interpreter::runContinueStmt() {
 
 RTimeVarSP Interpreter::evaluateExpr(const ExprSP &e) {
     auto *ptr = e.get();
+
+    return (this->*(ptr->evalFunction))(e);
     
-    if (instanceOf<ValueExpr>(ptr)) {
+    /*if (instanceOf<ValueExpr>(ptr)) {
         return evalValueExpr(e);
     }
     else if (instanceOf<IdentExpr>(ptr)) {
@@ -189,33 +191,14 @@ RTimeVarSP Interpreter::evaluateExpr(const ExprSP &e) {
     else {
         reportError("Invalid expression.");
         exit(EXIT_FAILURE);
-    }
+    }*/
 }
 
 RTimeVarSP Interpreter::evalValueExpr(const ExprSP &e) {
     auto *ptr = (ValueExpr*) e.get();
     auto tok = ptr->value;
-    auto type = tok->getType();
-    BasicTypeSP typeExpr;
-
-    switch(type) {
-        case TokenType::INT_LIT:
-            typeExpr = std::make_shared<BasicType>(std::make_shared<Token>("int"));
-            break;
-        case TokenType::DOUBLE_LIT:
-            typeExpr = std::make_shared<BasicType>(std::make_shared<Token>("double"));
-            break;
-        case TokenType::STRING_LIT:
-            typeExpr = std::make_shared<BasicType>(std::make_shared<Token>("string"));
-            break;
-        case TokenType::BOOL_LIT:
-            typeExpr = std::make_shared<BasicType>(std::make_shared<Token>("bool"));
-            break;
-        default:
-            throw RuntimeException("Invalid value expression.");
-    }
     
-   return std::make_shared<PrimitiveVar>(*evaluate(e), typeExpr);
+   return std::make_shared<PrimitiveVar>(*evaluate(e));
 }
 
 RTimeVarSP Interpreter::evalIdentExpr(const ExprSP &e) {

@@ -24,8 +24,6 @@ class Interpreter {
         void run();
         void load();
 
-
-    private:
         std::vector<StmtSP> statementList;
         VarEnv globalEnv, *innermost;
 

@@ -5,6 +5,7 @@ TARGET = $(OUTDIR)/$(TARGET_NAME)
 
 CC = g++
 CFLAGS = -Wall -Wextra -Wpedantic -MMD -O2
+LFLAGS = 
 MEMPROFILER = valgrind
 FORMATTER = clang-format
 
@@ -33,7 +34,7 @@ default:
 
 $(TARGET): $(OBJECTS) | $(OUTDIR)
 	@printf "$(PREFIX) Linking..."
-	@$(CC) -o $(TARGET) $^ $(CFLAGS) 
+	@$(CC) -o $(TARGET) $^ $(LFLAGS) 
 	@printf " $(DONE)"
 
 

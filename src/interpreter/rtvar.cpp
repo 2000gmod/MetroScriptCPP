@@ -16,30 +16,30 @@ PrimitiveVar &operator -(PrimitiveVar &rhs) {
 }
 
 PrimitiveVar &operator !(PrimitiveVar &rhs) {
-    if (rhs.getType() != "bool") throw RuntimeException("Cannot use unary ! on non-bool values");
+    if (rhs.value != 'b') throw RuntimeException("Cannot use unary ! on non-bool values");
     rhs.value.boolValue = !rhs.value.boolValue;
     return rhs;
 }
 
 
 PrimitiveVar operator +(const PrimitiveVar &lhs, const PrimitiveVar &rhs) {
-    return PrimitiveVar(lhs.value + rhs.value, lhs.type);
+    return PrimitiveVar(lhs.value + rhs.value);
 }
 
 PrimitiveVar operator -(const PrimitiveVar &lhs, const PrimitiveVar &rhs) {
-    return PrimitiveVar(lhs.value - rhs.value, lhs.type);
+    return PrimitiveVar(lhs.value - rhs.value);
 }
 
 PrimitiveVar operator *(const PrimitiveVar &lhs, const PrimitiveVar &rhs) {
-    return PrimitiveVar(lhs.value * rhs.value, lhs.type);
+    return PrimitiveVar(lhs.value * rhs.value);
 }
 
 PrimitiveVar operator /(const PrimitiveVar &lhs, const PrimitiveVar &rhs) {
-    return PrimitiveVar(lhs.value / rhs.value, lhs.type);
+    return PrimitiveVar(lhs.value / rhs.value);
 }
 
 PrimitiveVar operator %(const PrimitiveVar &lhs, const PrimitiveVar &rhs) {
-    return PrimitiveVar(lhs.value % rhs.value, lhs.type);
+    return PrimitiveVar(lhs.value % rhs.value);
 }
 
 
