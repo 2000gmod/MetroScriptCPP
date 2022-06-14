@@ -49,7 +49,7 @@ void parseMathPrompt() {
     }
 }
 
-void runFile(std::string filename) {
+void runFile(const std::string &filename) {
     std::ifstream file(filename);
     std::stringstream buffer;
     if (!(buffer << file.rdbuf())) {

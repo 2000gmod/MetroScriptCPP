@@ -56,7 +56,8 @@ void Interpreter::runFunction(const FunctionDeclStmtSP &fun) {
 void Interpreter::runStatement(const StmtSP &s) {
     auto *sptr = s.get();
 
-    if (instanceOf<BlockStmt>(sptr)) {
+    return (this->*(sptr->runFunction))(s);
+    /*if (instanceOf<BlockStmt>(sptr)) {
         runBlockStmt(s);
     }
     else if (instanceOf<ExprStmt>(sptr)) {
@@ -83,7 +84,7 @@ void Interpreter::runStatement(const StmtSP &s) {
     else {
         reportError("Invalid statement.");
         exit(EXIT_FAILURE);
-    }
+    }*/
 }
 
 void Interpreter::runBlockStmt(const StmtSP &s) {
@@ -148,11 +149,13 @@ void Interpreter::runWhileStmt(const StmtSP &s) {
     }
 }
 
-void Interpreter::runBreakStmt() {
+void Interpreter::runBreakStmt(const StmtSP &ignored) {
+    (void) ignored;
     throw LoopControlException(false);
 }
 
-void Interpreter::runContinueStmt() {
+void Interpreter::runContinueStmt(const StmtSP &ignored) {
+    (void) ignored;
     throw LoopControlException(true);
 }
 
@@ -347,5 +350,6 @@ void Interpreter::internalPrint(const std::vector<ExprSP> &args) {
     for (const auto &e : args) {
         std::cout << evaluateExpr(e)->toString();
     }
+    std::cout << std::flush;
     throw ReturnValueContainer(nullptr);
 }

@@ -37,8 +37,8 @@ class Interpreter {
         void runVarDeclStmt(const StmtSP &s);
         void runIfStmt(const StmtSP &s);
         void runWhileStmt(const StmtSP &s);
-        void runBreakStmt();
-        void runContinueStmt();
+        void runBreakStmt(const StmtSP &ignored);
+        void runContinueStmt(const StmtSP &ignored);
 
         RTimeVarSP evaluateExpr(const ExprSP &e);
         RTimeVarSP evalValueExpr(const ExprSP &e);

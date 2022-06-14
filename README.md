@@ -15,9 +15,9 @@ An imperative, statically typed, interpreted language, primarily designed for CL
 |------------------------------|------------------------------------------|
 | Tokenizer/Lexer              | Complete                                 |
 | Parser                       | Complete                                 |
-| Syntax Context Evaluator     | Not implemented                          |
-| Symbol Loader                | Not implemented                          |
-| Execution Engine             | Not implemented                          |
+| Syntax Context Evaluator     | Partial implementation                   |
+| Symbol Loader                | Partial implementation                   |
+| Execution Engine             | Implemented                              |
 | MetroScript Standard Library | Partial definition only, not implemented |
 
 ---
