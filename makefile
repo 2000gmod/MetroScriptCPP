@@ -5,9 +5,13 @@ TARGET = $(OUTDIR)/$(TARGET_NAME)
 
 CC = g++
 CFLAGS = -Wall -Wextra -Wpedantic -MMD -O2
-LFLAGS = 
+LFLAGS =
 MEMPROFILER = valgrind
 FORMATTER = clang-format
+
+RUN_ON_WINDOW_COMMAND = konsole --hide-menubar --hide-tabbar --nofork -e make runWithWait
+USE_NEW_WINDOW = false
+PRESS_TO_EXIT_MSG = "Program complete, press any key to exit..."
 
 MAINARGS = examples/helloworld.mtr
 
@@ -30,17 +34,17 @@ DONE = Done\n
 
 .PHONY: default
 default:
-	$(MAKE) $(TARGET)
+	@/usr/bin/time --format="$(PREFIX) Time: %E seconds" $(MAKE) $(TARGET)
 
 $(TARGET): $(OBJECTS) | $(OUTDIR)
 	@printf "$(PREFIX) Linking..."
-	@$(CC) -o $(TARGET) $^ $(LFLAGS) 
+	@$(CC) -o $(TARGET) $^ $(LFLAGS)
 	@printf " $(DONE)"
 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
 	@printf "$(PREFIX) Compiling $<..."
-	@$(CC) -c $< -o $@ $(CFLAGS)
+	@$(CC) -c $< -o $@ $(CFLAGS) || (printf "\n\nBuild failed at file: $<.\n"; exit 1)
 	@printf " $(DONE)"
 
 
@@ -58,17 +62,21 @@ $(OBJDIR):
 	@printf " $(DONE)"
 
 
-.PHONY: clean deepclean run debug
+.PHONY: clean deepclean run debug runToFile runWithWait
 
-run: $(TARGET)
-	@printf "$(PREFIX) Running target: $(TARGET)\n\n"
-	@$(TARGET) $(MAINARGS)
+run: default
+	@printf "$(PREFIX) Running target: $(TARGET) $(MAINARGS)\n\n"
+	@if ($(USE_NEW_WINDOW)) then $(RUN_ON_WINDOW_COMMAND) 2> /dev/null; else ($(TARGET) $(MAINARGS)); fi;
 
-runToFile: $(TARGET)
+runToFile: default
 	@printf "$(PREFIX) Running target: $(TARGET)\n"
 	@printf "$(PREFIX) Redirecting stdout to: $(OUT_FILE)\n\n"
 	@$(TARGET) $(MAINARGS) $(OUT)
-	
+
+runWithWait: $(TARGET)
+	-@$(TARGET) $(MAINARGS)
+	@printf "\n\n\n"
+	@read  -r -p $(PRESS_TO_EXIT_MSG) key
 
 clean:
 	@printf "$(PREFIX) Deleting output directory..."
@@ -89,3 +97,4 @@ memdiag: $(TARGET)
 	@printf "$(PREFIX) Running $(MEMPROFILER)...\n"
 	@$(MEMPROFILER) $(TARGET) $(MAINARGS)
 	@printf "$(DONE)"
+

@@ -1,0 +1,11 @@
+CC = g++
+CFLAGS = -Wall -Wextra -Wpedantic -O2
+LFLAGS = 
+
+MAINARGS = examples/helloworld.mtr
+
+TARGET = mscppi
+OUTDIR = out
+OBJDIR = obj
+SRCDIR = src
+SRCEXT = cpp
