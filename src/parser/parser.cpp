@@ -348,7 +348,22 @@ ExprSP Parser::primaryExpr() {
         return std::make_shared<ValueExpr>(std::make_shared<Token>(previous()));
     }
     if (match(TokenType::IDENTIFIER)) {
-        return std::make_shared<IdentExpr>(std::make_shared<Token>(previous()));
+        auto id = previous();
+        auto idPtr = std::make_shared<Token>(id);
+        if (match({TokenType::INC, TokenType::DEC})) {
+            auto pr = previous();
+            if (pr.getType() == TokenType::INC) {
+                return std::make_shared<AsignExpr>(
+                    idPtr, std::make_shared<BinaryExpr>(std::make_shared<IdentExpr>(idPtr), std::make_shared<ValueExpr>(std::make_shared<Token>("1")), std::make_shared<Token>("+"))
+                );
+            }
+            else {
+                return std::make_shared<AsignExpr>(
+                    idPtr, std::make_shared<BinaryExpr>(std::make_shared<IdentExpr>(idPtr), std::make_shared<ValueExpr>(std::make_shared<Token>("1")), std::make_shared<Token>("-"))
+                );
+            }
+        }
+        return std::make_shared<IdentExpr>(std::make_shared<Token>(id));
     }
 
     if (match(TokenType::LEFT_PAREN)) {

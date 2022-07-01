@@ -32,6 +32,12 @@ string toString(const TokenType &tp) {
         case TokenType::MOD:
             out += "MOD";
             break;
+        case TokenType::INC:
+            out += "INC";
+            break;
+        case TokenType::DEC:
+            out += "DEC";
+            break;
         case TokenType::ASSIGN:
             out += "ASSIGN";
             break;
@@ -343,6 +349,12 @@ Token::Token(string token) {
     }
     else if (token == "%") {
         type = TokenType::MOD;
+    }
+    else if (token == "++") {
+        type = TokenType::INC;
+    }
+    else if (token == "--") {
+        type = TokenType::DEC;
     }
     else if (token == "=") {
         type = TokenType::ASSIGN;

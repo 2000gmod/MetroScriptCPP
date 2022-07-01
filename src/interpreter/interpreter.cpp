@@ -293,7 +293,7 @@ RTimeVarSP Interpreter::evalCallExpr(const ExprSP &e) {
     try {
         interceptBuiltIns(name, ptr->args);
     }
-    catch (ReturnValueContainer e) {
+    catch (const ReturnValueContainer &e) {
         return e.value;
     }
 
@@ -316,7 +316,7 @@ RTimeVarSP Interpreter::evalCallExpr(const ExprSP &e) {
         }
         runFunction(fun);
     }
-    catch (ReturnValueContainer &e) {
+    catch (const ReturnValueContainer &e) {
         out = e.value;
     }
     innermost = newScope.enclosing;

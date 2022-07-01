@@ -31,7 +31,7 @@ void primeSearch(int max) {
 
 void main() {
     print("Hello, world!\n");
-    for (int j = 1; j < 11; j = j + 1) {
+    for (int j = 1; j < 11; j++) {
         print(fact(j), "\n");
     }
 }

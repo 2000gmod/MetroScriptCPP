@@ -14,6 +14,8 @@ enum class TokenType {
     COMMA,
     DOT,
     MOD,
+    INC,
+    DEC,
 
     ASSIGN,
     EQ,
